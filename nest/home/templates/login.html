@@ -1,3 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %} Login Page {% endblock %}
+{% block loginactive %} active {% endblock loginactive %}
+
+{% block css %}
+{% endblock %}
+{% block body %}
 <form action="/login/" method="POST"> {% csrf_token %}
   <div class="container mt-5">
   <div class="mb-3">
@@ -12,3 +20,4 @@
   <button type="submit" class="btn btn-primary">Submit</button>
 </div>
 </form>
+{% endblock %}

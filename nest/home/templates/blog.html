@@ -1,5 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %} Blogs {% endblock %}
+{% block homeactive %} active {% endblock homeactive %}
+
+{% block css %}
+
+{% endblock %}
+{% block body %}
 <div class="container mt-5 mb-3">
- 
+
     <div class="row">
         {% for post in posts %}
         <div class="col-lg-4 my-4">
@@ -15,3 +24,7 @@
         {% endfor %}
     </div>
 </div>
+{% endblock %}
+{% block js %} 
+<script></script>
+{% endblock %}
