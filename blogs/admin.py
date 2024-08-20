@@ -1,3 +1,17 @@
-from django.contrib import admin
+# blogs/admin.py
 
-# Register your models here.
+from django.contrib import admin
+from .models import BlogPost, Tag
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'status', 'created_at', 'updated_at')
+    prepopulated_fields = {'slug': ('title',)}
+    list_filter = ('status', 'author', 'tags')
+    search_fields = ('title', 'content')
+    ordering = ['-created_at']
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
