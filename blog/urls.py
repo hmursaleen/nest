@@ -17,10 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
-
 
 '''
 API documentation view
@@ -49,8 +45,10 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blogs.urls')),
+
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/', include('blogs.urls')),  # Include the blogs app API
 ]
-

@@ -62,7 +62,7 @@ class BlogPostCreateView(LoginRequiredMixin, CreateView):
 # UpdateView to update an existing blog post
 class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = BlogPost
-    template_name = 'blogs/blogpost_form.html'  # Specify the template to use
+    template_name = 'blogs/blogpost_update_form.html'  # Specify the template to use
     fields = ['title', 'slug', 'content', 'tags', 'status', 'published_at']  # Form fields to include
 
     def get_success_url(self):
@@ -75,7 +75,7 @@ class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
     	post = self.get_object()
-        return self.request.user == post.author
+    	return self.request.user == post.author
 
 
 
@@ -95,7 +95,7 @@ class BlogPostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
     	post = self.get_object()
-        return self.request.user == post.author
+    	return self.request.user == post.author
 
 
 

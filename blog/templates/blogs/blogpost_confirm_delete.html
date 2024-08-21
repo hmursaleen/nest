@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Delete Blog Post
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="text-danger">Delete Blog Post</h2>
+            <p class="lead">Are you sure you want to delete the following blog post?</p>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">{{ object.title }}</h3>
+                    <p class="card-text">{{ object.content|slice:":200" }}{% if object.content|length > 200 %}...{% endif %}</p>
+                    <p class="text-muted">Created by {{ object.author }} on {{ object.created_at|date:"F d, Y" }}</p>
+                </div>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete Post</button>
+                <a href="{% url 'blogs:post_detail' slug=object.slug %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

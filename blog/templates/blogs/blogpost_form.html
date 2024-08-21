@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Create a New Blog Post
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Create a New Blog Post</h2>
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="form-group">
+                    <label for="id_title">Title</label>
+                    {{ form.title|add_class:"form-control" }}
+                    <div class="form-text text-muted">
+                        Enter the title of your blog post.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_slug">Slug</label>
+                    {{ form.slug|add_class:"form-control" }}
+                    <div class="form-text text-muted">
+                        Enter a URL-friendly slug for your blog post. 
+                        This should be unique.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_content">Content</label>
+                    {{ form.content|add_class:"form-control" }}
+                    <div class="form-text text-muted">
+                        Write the content of your blog post here.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_tags">Tags</label>
+                    {{ form.tags|add_class:"form-control" }}
+                    <div class="form-text text-muted">
+                        Add relevant tags to categorize your post. You can select multiple tags.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_status">Status</label>
+                    {{ form.status|add_class:"form-control" }}
+                    <div class="form-text text-muted">
+                        Choose whether to publish the post immediately or save it as a draft.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_published_at">Publish Date</label>
+                    {{ form.published_at|add_class:"form-control" }}
+                    <div class="form-text text-muted">
+                        Set a date and time to publish the post, or leave blank to publish immediately.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create Post</button>
+                <a href="{% url 'blogs:post_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
