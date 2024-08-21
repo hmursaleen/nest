@@ -42,7 +42,50 @@ INSTALLED_APPS = [
     'blogs.apps.BlogsConfig',
     'comments.apps.CommentsConfig',
     'core.apps.CoreConfig',
+    'rest_framework',
+    'drf_yasg',
 ]
+
+'''
+You can customize DRF’s behavior through settings in your settings.py file. 
+For example, you can set the default pagination, authentication, and permissions.
+'''
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+
+    #Throttling: Implement throttling to prevent abuse of your API.
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '100/day',
+        'anon': '10/hour',
+    },
+}
+
+
+
+'''
+DEFAULT_AUTHENTICATION_CLASSES: Defines the authentication methods to be used. 
+Here, we're using both session and token authentication.
+
+DEFAULT_PERMISSION_CLASSES: Defines the default permissions. 
+IsAuthenticatedOrReadOnly means that authenticated users can perform write operations, while others can only read.
+
+DEFAULT_PAGINATION_CLASS and PAGE_SIZE: Sets the pagination class and the number of items per page.
+'''
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -17,7 +17,7 @@ to specify the condition that must be met for the user to pass the test.
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import BlogPost
+from .models import BlogPost, Tag
 
 # ListView to display all published blog posts
 class BlogPostListView(ListView):
@@ -96,3 +96,41 @@ class BlogPostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
     	post = self.get_object()
         return self.request.user == post.author
+
+
+
+
+
+'''
+Creating API Views
+DRF allows you to create API views in several ways. The most common approach 
+is to use viewsets, which automatically provide implementations for CRUD operations.
+'''
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .serializers import BlogPostSerializer, TagSerializer
+
+
+'''
+viewsets.ModelViewSet: Provides default implementations for list, create, 
+retrieve, update, and destroy actions.
+
+permission_classes: Specifies the permissions. Here, we're using IsAuthenticatedOrReadOnly.
+
+perform_create: Overrides the default behavior to associate the currently 
+logged-in user as the author of a blog post.
+'''
+
+class BlogPostViewSet(viewsets.ModelViewSet):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
