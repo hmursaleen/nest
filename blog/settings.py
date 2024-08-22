@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'blogs.apps.BlogsConfig',
     'comments.apps.CommentsConfig',
     'core.apps.CoreConfig',
+    'authentication.apps.AuthenticationConfig',
     'rest_framework',
     'drf_yasg',
 ]
@@ -180,3 +181,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#LOGIN_REDIRECT_URL = 'post_list'
+
