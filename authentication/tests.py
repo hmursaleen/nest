@@ -10,7 +10,7 @@ class LoginViewTests(TestCase):
     def test_login_view(self):
         response = self.client.get(reverse('authentication:login'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'authentication/login.html')
+        self.assertTemplateUsed(response, 'login.html')
 
     def test_login_success(self):
         login = self.client.login(username='testuser', password='password123')

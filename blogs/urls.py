@@ -6,11 +6,11 @@ from .views import BlogPostListView, BlogPostDetailView, BlogPostCreateView, Blo
 app_name = 'blogs'
 
 urlpatterns = [
-    path('', BlogPostListView.as_view(), name='post_list'),  # List all posts
-    path('post/<slug:slug>/', BlogPostDetailView.as_view(), name='post_detail'),  # View a single post
-    path('post/new/', BlogPostCreateView.as_view(), name='post_create'),  # Create a new post
-    path('post/<slug:slug>/edit/', BlogPostUpdateView.as_view(), name='post_update'),  # Update a post
-    path('post/<slug:slug>/delete/', BlogPostDeleteView.as_view(), name='post_delete'),  # Delete a post
+    path('all/', BlogPostListView.as_view(), name='post_list'),  # List all posts
+    path('new/', BlogPostCreateView.as_view(), name='post_create'),  # Create a new post
+    path('<slug:slug>/', BlogPostDetailView.as_view(), name='post_detail'),  # View a single post
+    path('<slug:slug>/edit/', BlogPostUpdateView.as_view(), name='post_update'),  # Update a post
+    path('<slug:slug>/delete/', BlogPostDeleteView.as_view(), name='post_delete'),  # Delete a post
 ]
 
 
@@ -21,7 +21,7 @@ router = DefaultRouter()
 router.register(r'posts', BlogPostViewSet)
 router.register(r'tags', TagViewSet)
 
-urlpatterns = [
+urlpatterns += [
     path('', include(router.urls)),
 ]
 

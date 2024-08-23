@@ -1,5 +1,6 @@
 # blogs/models.py
 
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User  # Import the User model for author field
 

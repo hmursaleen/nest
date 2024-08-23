@@ -18,11 +18,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import BlogPost, Tag
+from .forms import BlogPostForm, BlogPostUpdateForm
 
 # ListView to display all published blog posts
 class BlogPostListView(ListView):
     model = BlogPost
-    template_name = 'blogs/blogpost_list.html'  # Specify the template to use
+    template_name = 'blogpost_list.html'  # Specify the template to use
     context_object_name = 'posts'  # Name of the context variable to use in the template
     paginate_by = 10  # Number of posts per page
 
@@ -36,34 +37,33 @@ class BlogPostListView(ListView):
 # DetailView to display a single blog post
 class BlogPostDetailView(DetailView):
     model = BlogPost
-    template_name = 'blogs/blogpost_detail.html'
+    template_name = 'blogpost_detail.html'
     context_object_name = 'post'
+
+
+
 
 # CreateView to create a new blog post
 class BlogPostCreateView(LoginRequiredMixin, CreateView):
     model = BlogPost
-    template_name = 'blogs/blogpost_form.html'  # Specify the template to use
-    fields = ['title', 'slug', 'content', 'tags', 'status', 'published_at']  # Form fields to include
+    form_class = BlogPostForm
+    template_name = 'blogpost_form.html'
 
     def form_valid(self, form):
-        """
-        This method is called when valid form data has been posted.
-        It sets the author to the currently logged-in user before saving.
-        """
         form.instance.author = self.request.user
         return super().form_valid(form)
 
     def get_success_url(self):
-        """
-        Redirect to the detail view of the newly created post.
-        """
         return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.slug})
+
+
+
 
 # UpdateView to update an existing blog post
 class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = BlogPost
-    template_name = 'blogs/blogpost_update_form.html'  # Specify the template to use
-    fields = ['title', 'slug', 'content', 'tags', 'status', 'published_at']  # Form fields to include
+    form_class = BlogPostUpdateForm  # Use the custom form
+    template_name = 'blogpost_update_form.html'  # Specify the template to use
 
     def get_success_url(self):
         """
@@ -71,11 +71,9 @@ class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
         return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.slug})
 
-
-
     def test_func(self):
-    	post = self.get_object()
-    	return self.request.user == post.author
+        post = self.get_object()
+        return self.request.user == post.author
 
 
 
@@ -84,7 +82,7 @@ class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 # DeleteView to delete a blog post
 class BlogPostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = BlogPost
-    template_name = 'blogs/blogpost_confirm_delete.html'  # Specify the template to use
+    template_name = 'blogpost_confirm_delete.html'  # Specify the template to use
 
     def get_success_url(self):
         """

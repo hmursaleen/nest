@@ -57,7 +57,7 @@ class BlogPostListViewTests(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('blogs:post_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogs/blogpost_list.html')
+        self.assertTemplateUsed(response, 'blogpost_list.html')
 
     def test_pagination_is_ten(self):
         response = self.client.get(reverse('blogs:post_list'))
@@ -110,7 +110,7 @@ class BlogPostCreateViewTests(TestCase):
     def test_create_post_uses_correct_template(self):
         response = self.client.get(reverse('blogs:post_create'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogs/blogpost_form.html')
+        self.assertTemplateUsed(response, 'blogpost_form.html')
 
 
 
@@ -204,7 +204,7 @@ class BlogPostDetailViewTests(TestCase):
     def test_blogpost_detail_view_uses_correct_template(self):
         response = self.client.get(reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogs/blogpost_detail.html')
+        self.assertTemplateUsed(response, 'blogpost_detail.html')
 
     def test_blogpost_detail_view_displays_correct_post(self):
         response = self.client.get(reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
@@ -261,7 +261,7 @@ class BlogPostUpdateViewTests(TestCase):
         self.client.login(username='author', password='testpassword')
         response = self.client.get(reverse('blogs:post_update', kwargs={'slug': self.post.slug}))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogs/blogpost_form.html')
+        self.assertTemplateUsed(response, 'blogpost_form.html')
 
     def test_blogpost_update_with_valid_data(self):
         self.client.login(username='author', password='testpassword')
@@ -342,7 +342,7 @@ class BlogPostDeleteViewTests(TestCase):
         self.client.login(username='author', password='testpassword')
         response = self.client.get(reverse('blogs:post_delete', kwargs={'slug': self.post.slug}))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogs/blogpost_confirm_delete.html')
+        self.assertTemplateUsed(response, 'blogpost_confirm_delete.html')
 
     def test_blogpost_successful_deletion(self):
         self.client.login(username='author', password='testpassword')
