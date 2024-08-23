@@ -1,7 +1,7 @@
 # blogs/urls.py
 
 from django.urls import path, include
-from .views import BlogPostListView, BlogPostDetailView, BlogPostCreateView, BlogPostUpdateView, BlogPostDeleteView
+from .views import BlogPostListView, BlogPostDetailView, BlogPostCreateView, BlogPostUpdateView, BlogPostDeleteView, TagDetailView
 
 app_name = 'blogs'
 
@@ -11,7 +11,10 @@ urlpatterns = [
     path('<slug:slug>/', BlogPostDetailView.as_view(), name='post_detail'),  # View a single post
     path('<slug:slug>/edit/', BlogPostUpdateView.as_view(), name='post_update'),  # Update a post
     path('<slug:slug>/delete/', BlogPostDeleteView.as_view(), name='post_delete'),  # Delete a post
-]
+    path('tag/<str:name>/', TagDetailView.as_view(), name='tag_detail'),
+    ]
+
+
 
 
 from rest_framework.routers import DefaultRouter

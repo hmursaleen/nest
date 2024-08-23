@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',
     'rest_framework',
     'drf_yasg',
+    'django_select2',
 ]
 
 '''
@@ -175,7 +177,31 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+
+# URL to use when referring to static files located in STATICFILES_DIRS
+STATIC_URL = '/static/'
+
+# The absolute path to the directory where collectstatic will collect static files for deployment
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Additional locations of static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+'''
+STATIC_URL:
+
+This defines the base URL for your static files. When you use {% static 'path/to/file' %}, Django will generate URLs starting with /static/. This URL is used to access your static files in templates and views.
+STATIC_ROOT:
+
+This is the directory where Django will collect all the static files when you run the collectstatic command. This is particularly useful in a production environment where you serve static files from a single directory.
+For development, you usually don’t need to worry about STATIC_ROOT, but in production, you’ll point your web server to serve files from this directory.
+STATICFILES_DIRS:
+
+This is a list of directories where Django will look for additional static files apart from the ones in your apps’ static folders. This allows you to store global static files (like global CSS, JavaScript, or images) in a separate directory within your project.
+In the example above, the directory static is assumed to be in the root of your project (BASE_DIR), and it will contain all your custom static files.
+'''
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

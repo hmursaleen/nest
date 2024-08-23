@@ -23,3 +23,16 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_scripts %}
+    {{ block.super }}
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 on the tags field
+            $('#id_tags').select2({
+                placeholder: "Select tags",
+                allowClear: true,
+            });
+        });
+    </script>
+{% endblock %}

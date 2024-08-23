@@ -19,6 +19,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from .models import BlogPost, Tag
 from .forms import BlogPostForm, BlogPostUpdateForm
+from django.shortcuts import get_object_or_404
 
 # ListView to display all published blog posts
 class BlogPostListView(ListView):
@@ -55,6 +56,9 @@ class BlogPostCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.slug})
+
+
+
 
 
 
@@ -97,6 +101,28 @@ class BlogPostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 
+
+
+
+
+
+
+
+
+class TagDetailView(ListView):
+    model = BlogPost
+    template_name = 'tag_detail.html'  # Specify the template to use
+    context_object_name = 'posts'
+    paginate_by = 10  # If you want to paginate the posts
+
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, name=self.kwargs['name'])
+        return BlogPost.objects.filter(tags=self.tag).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        return context
 
 
 '''
