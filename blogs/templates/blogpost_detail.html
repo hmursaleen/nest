@@ -44,6 +44,33 @@
                     <a href="{% url 'blogs:post_delete' slug=post.slug %}" class="btn btn-danger">Delete Post</a>
                 {% endif %}
             </div>
+
+
+            <div class="comments-section">
+                <h4>Comments</h4>
+                {% for comment in post.comments.all %}
+                    <div class="comment">
+                        <strong>{{ comment.author }}</strong>
+                        <p>{{ comment.content }}</p>
+                        <a href="{% url 'comments:comment_create' post.slug %}?parent_id={{ comment.id }}" class="btn btn-link">Reply</a>
+                        <!-- Display replies -->
+                        {% if comment.children.exists %}
+                            <div class="replies ml-4">
+                                {% for reply in comment.children.all %}
+                                    <div class="comment">
+                                        <strong>{{ reply.author }}</strong>
+                                        <p>{{ reply.content }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p>No comments yet.</p>
+                {% endfor %}
+            </div>
+             {% include 'comments/comment_form.html' %}
+
         </div>
     </div>
 </div>
