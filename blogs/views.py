@@ -35,11 +35,17 @@ class BlogPostListView(ListView):
         """
         return BlogPost.objects.filter(status='published').order_by('-created_at')
 
-# DetailView to display a single blog post
+
+
 class BlogPostDetailView(DetailView):
     model = BlogPost
     template_name = 'blogpost_detail.html'
     context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comments.filter(parent__isnull=True)  # Get top-level comments
+        return context
 
 
 

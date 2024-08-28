@@ -1,24 +1,37 @@
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import FormView
-from .models import Comment, BlogPost
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from .models import Comment
 from .forms import CommentForm
+from blogs.models import BlogPost
 
-class CommentCreateView(FormView):
+class CommentCreateView(CreateView):
+    model = Comment
     form_class = CommentForm
-    template_name = 'comments/comment_form.html'  # Create a template to handle the form
+    template_name = 'comment_form.html'
 
     def form_valid(self, form):
-        post = get_object_or_404(BlogPost, slug=self.kwargs['slug'])
-        comment = form.save(commit=False)
-        comment.post = post
-        comment.author = self.request.user
-        comment.save()
-        return redirect(post.get_absolute_url())
+        # Assign the author and post to the comment
+        form.instance.author = self.request.user
+        form.instance.post = self.get_post()
+        return super().form_valid(form)
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        parent_comment = None
-        if 'parent_id' in self.request.GET:
-            parent_comment = get_object_or_404(Comment, id=self.request.GET['parent_id'])
-        kwargs['parent'] = parent_comment
-        return kwargs
+    def get_success_url(self):
+        # Redirect back to the post detail page after a comment is added
+        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.get_post().slug})
+
+    def get_post(self):
+        # Get the post object that this comment is associated with
+        return BlogPost.objects.get(slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post'] = self.get_post()
+        return context
+
+
+    '''
+    form_valid: Automatically sets the author and post fields before saving the form.
+	get_success_url: Redirects the user back to the blog post detail page after the comment is submitted.
+	get_post: Retrieves the post associated with the comment using the slug from the URL.
+	get_context_data: Passes the post object to the template context for displaying post-specific information.
+	'''
