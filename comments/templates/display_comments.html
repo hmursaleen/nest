@@ -6,9 +6,15 @@
                             <li class="media mb-4">
                                 <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
                                 <div class="media-body">
-                                    <h5 class="mt-0 mb-1">{{ comment.author }}</h5>
-                                    <p>{{ comment.content }}</p>
+                                    <h5 class="mt-0 mb-1">{{ comment.author }} </h5>
                                     <small class="text-muted">{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
+                                    
+                                    <p>{{ comment.content }}</p>
+
+                                    {% if request.user == comment.author %}
+                                        <a href="{% url 'comments:comment_update' pk=comment.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                                    {% endif %}
+
                                     
                                     {% if comment.replies.all %}
                                         <ul class="list-unstyled mt-3 ml-5">
