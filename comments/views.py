@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Comment
 from .forms import CommentForm
 from blogs.models import BlogPost
@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 
-class CommentCreateView(CreateView):
+class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'comment_form.html'
@@ -18,6 +18,10 @@ class CommentCreateView(CreateView):
         form.instance.author = self.request.user
         form.instance.post = self.get_post()
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Ensure that the form is returned with errors
+        return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
         # Redirect back to the post detail page after a comment is added
@@ -68,3 +72,27 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         handle_no_permission Method: This method handles what happens if the user doesn't pass 
         the test_func check. You can customize the response, such as redirecting the user back to the post detail page.
         '''
+
+
+
+
+
+
+
+from django.http import HttpResponseForbidden
+
+class CommentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Comment
+    template_name = 'comment_confirm_delete.html'
+
+    def get_object(self, queryset=None):
+        """Ensure that only the author can delete the comment."""
+        obj = super().get_object(queryset)
+        if obj.author != self.request.user:
+            return HttpResponseForbidden("You do not have permission to delete this comment.")
+        return obj
+
+    def get_success_url(self):
+        """Redirect to the post detail page after successful deletion."""
+        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+

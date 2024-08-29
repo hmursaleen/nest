@@ -1,42 +1,42 @@
 <div class="comments-section">
-                <h3>Comments</h3>
-                {% if comments %}
-                    <ul class="list-unstyled">
-                        {% for comment in comments %}
-                            <li class="media mb-4">
-                                <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
-                                <div class="media-body">
-                                    <h5 class="mt-0 mb-1">{{ comment.author }} </h5>
-                                    <small class="text-muted">{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
-                                    
-                                    <p>{{ comment.content }}</p>
+    <h3>Comments</h3>
+    {% if comments %}
+        <ul class="list-unstyled">
+            {% for comment in comments %}
+                <li class="media mb-4">
+                    <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
+                    <div class="media-body">
+                        <h5 class="mt-0 mb-1">{{ comment.author }}</h5>
+                        <small class="text-muted">{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
 
-                                    {% if request.user == comment.author %}
-                                        <a href="{% url 'comments:comment_update' pk=comment.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                                    {% endif %}
+                        <p>{{ comment.content }}</p>
 
-                                    
-                                    {% if comment.replies.all %}
-                                        <ul class="list-unstyled mt-3 ml-5">
-                                            {% for reply in comment.replies.all %}
-                                                <li class="media mb-3">
-                                                    <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
-                                                    <div class="media-body">
-                                                        <h5 class="mt-0 mb-1">{{ reply.author }}</h5>
-                                                        <p>{{ reply.content }}</p>
-                                                        <small class="text-muted">{{ reply.created_at|date:"F j, Y, g:i a" }}</small>
-                                                    </div>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="text-muted">No comments yet. Be the first to comment!</p>
-                {% endif %}
+                        {% if request.user == comment.author %}
+                            <a href="{% url 'comments:comment_update' pk=comment.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'comments:comment_delete' pk=comment.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% endif %}
 
-                <a href="{% url 'comments:add_comment' slug=post.slug %}" class="btn btn-success">Add Comment</a>
-            </div>
+                        {% if comment.replies.all %}
+                            <ul class="list-unstyled mt-3 ml-5">
+                                {% for reply in comment.replies.all %}
+                                    <li class="media mb-3">
+                                        <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
+                                        <div class="media-body">
+                                            <h5 class="mt-0 mb-1">{{ reply.author }}</h5>
+                                            <p>{{ reply.content }}</p>
+                                            <small class="text-muted">{{ reply.created_at|date:"F j, Y, g:i a" }}</small>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No comments yet. Be the first to comment!</p>
+    {% endif %}
+
+    <a href="{% url 'comments:add_comment' slug=post.slug %}" class="btn btn-success">Add Comment</a>
+</div>

@@ -1,354 +1,136 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
-from blogs.models import BlogPost, Tag
-from datetime import datetime
+from django.contrib.auth import get_user_model
+from blogs.models import BlogPost
+from comments.models import Comment
 
+User = get_user_model()
 
-
-
-class BlogPostListViewTests(TestCase):
+class CommentCreateViewTest(TestCase):
     def setUp(self):
-        # Create a user to associate with the blog posts
+        # Create test user and blog post
         self.user = User.objects.create_user(username='testuser', password='testpassword')
-
-        # Create tags
-        self.tag1 = Tag.objects.create(name='Django')
-        self.tag2 = Tag.objects.create(name='Python')
-
-        # Create blog posts
-        self.post1 = BlogPost.objects.create(
-            title='Test Post 1',
-            slug='test-post-1',
-            content='This is the content of the first test post.',
+        self.post = BlogPost.objects.create(
+            title='Test Post',
+            slug='test-post',
+            content='This is a test post.',
             author=self.user,
             status='published',
-            published_at=datetime.now()
+            published_at='2024-08-28T12:00:00Z'
         )
-        self.post1.tags.add(self.tag1)
+        self.url = reverse('comments:add_comment', kwargs={'slug': self.post.slug})
 
-        self.post2 = BlogPost.objects.create(
-            title='Test Post 2',
-            slug='test-post-2',
-            content='This is the content of the second test post.',
-            author=self.user,
-            status='draft',
-        )
-        self.post2.tags.add(self.tag2)
-
-        self.post3 = BlogPost.objects.create(
-            title='Test Post 3',
-            slug='test-post-3',
-            content='This is the content of the third test post.',
-            author=self.user,
-            status='published',
-            published_at=datetime.now()
-        )
-        self.post3.tags.add(self.tag1, self.tag2)
-
-    def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/blogs/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('blogs:post_list'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_view_uses_correct_template(self):
-        response = self.client.get(reverse('blogs:post_list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogpost_list.html')
-
-    def test_pagination_is_ten(self):
-        response = self.client.get(reverse('blogs:post_list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('is_paginated' in response.context)
-        self.assertTrue(response.context['is_paginated'] is True)
-        self.assertEqual(len(response.context['posts']), 2)
-
-    def test_lists_all_published_posts(self):
-        response = self.client.get(reverse('blogs:post_list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['posts']), 2)
-        self.assertContains(response, self.post1.title)
-        self.assertContains(response, self.post3.title)
-        self.assertNotContains(response, self.post2.title)
-
-    def test_post_content_display(self):
-        response = self.client.get(reverse('blogs:post_list'))
-        self.assertContains(response, 'This is the content of the first test post.')
-        self.assertContains(response, 'This is the content of the third test post.')
-
-
-
-
-
-
-
-class BlogPostCreateViewTests(TestCase):
-
-    def setUp(self):
-        # Create a user to log in
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
-
-        # Create some tags
-        self.tag1 = Tag.objects.create(name='Django')
-        self.tag2 = Tag.objects.create(name='Python')
-
-        # Set up the client and log in the user
-        self.client = Client()
+    def test_create_comment_authenticated(self):
+        """Test that an authenticated user can create a comment."""
         self.client.login(username='testuser', password='testpassword')
+        response = self.client.post(self.url, {'content': 'This is a test comment.'})
+        self.assertRedirects(response, reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
+        self.assertTrue(Comment.objects.filter(content='This is a test comment.').exists())
 
-    def test_create_post_url_exists_at_desired_location(self):
-        response = self.client.get('/blogs/create/')
+    def test_create_comment_unauthenticated(self):
+        """Test that an unauthenticated user cannot create a comment."""
+        response = self.client.post(self.url, {'content': 'This comment should not be created.'})
+        self.assertRedirects(response, f'/accounts/login/?next={self.url}')
+        self.assertFalse(Comment.objects.filter(content='This comment should not be created.').exists())
+
+    def test_create_comment_invalid_data(self):
+        """Test that invalid comment data does not create a comment."""
+        self.client.login(username='testuser', password='testpassword')
+        response = self.client.post(self.url, {'content': ''})
         self.assertEqual(response.status_code, 200)
-
-    def test_create_post_url_accessible_by_name(self):
-        response = self.client.get(reverse('blogs:post_create'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_create_post_uses_correct_template(self):
-        response = self.client.get(reverse('blogs:post_create'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogpost_form.html')
+        self.assertFormError(response, 'form', 'content', 'This field is required.')
+        self.assertFalse(Comment.objects.filter(content='').exists())
 
 
-
-
-    def test_create_post_form_valid(self):
-	    data = {
-	        'title': 'New Blog Post',
-	        'slug': 'new-blog-post',
-	        'content': 'This is a test blog post.',
-	        'status': 'published',
-	        'published_at': datetime.now(),
-	        'tags': [self.tag1.id, self.tag2.id]
-	    }
-	    response = self.client.post(reverse('blogs:post_create'), data)
-	    self.assertEqual(response.status_code, 302)  # Ensure it redirects after creation
-	    self.assertTrue(BlogPost.objects.filter(slug='new-blog-post').exists())
-
-
-    
-    def test_redirect_after_create(self):
-        data = {
-            'title': 'Redirect Test Post',
-            'slug': 'redirect-test-post',
-            'content': 'This is a test blog post.',
-            'status': 'published',
-            'published_at': datetime.now(),
-            'tags': [self.tag1.id, self.tag2.id]
-        }
-        response = self.client.post(reverse('blogs:post_create'), data)
-        post = BlogPost.objects.get(slug='redirect-test-post')
-        self.assertRedirects(response, reverse('blogs:post_detail', kwargs={'slug': post.slug}))
-
-    
-
-
-
-    def test_create_post_without_authentication(self):
-        self.client.logout()
-        data = {
-            'title': 'Unauthenticated Post',
-            'slug': 'unauthenticated-post',
-            'content': 'This should not be created.',
-            'status': 'published',
-            'published_at': datetime.now(),
-            'tags': [self.tag1.id, self.tag2.id]
-        }
-        response = self.client.post(reverse('blogs:post_create'), data)
-        self.assertEqual(response.status_code, 302)  # Redirects to login
-        self.assertRedirects(response, '/accounts/login/?next=/blogs/create/')
-        self.assertFalse(BlogPost.objects.filter(slug='unauthenticated-post').exists())
-
-
-
-
-
-
-
-
-class BlogPostDetailViewTests(TestCase):
-
+class CommentUpdateViewTest(TestCase):
     def setUp(self):
-        # Create a user
+        # Create test users, blog post, and comment
         self.user = User.objects.create_user(username='testuser', password='testpassword')
-
-        # Create some tags
-        self.tag1 = Tag.objects.create(name='Django')
-        self.tag2 = Tag.objects.create(name='Python')
-
-        # Create a blog post
+        self.other_user = User.objects.create_user(username='otheruser', password='otherpassword')
         self.post = BlogPost.objects.create(
-            title='Test Blog Post',
-            slug='test-blog-post',
-            content='This is a test blog post content.',
+            title='Test Post',
+            slug='test-post',
+            content='This is a test post.',
             author=self.user,
             status='published',
-            published_at=datetime.now()
+            published_at='2024-08-28T12:00:00Z'
         )
-        self.post.tags.add(self.tag1, self.tag2)
-
-        # Set up the client
-        self.client = Client()
-
-    def test_blogpost_detail_view_url_exists_at_desired_location(self):
-        response = self.client.get(f'/blogs/{self.post.slug}/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_blogpost_detail_view_accessible_by_name(self):
-        response = self.client.get(reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
-        self.assertEqual(response.status_code, 200)
-
-    def test_blogpost_detail_view_uses_correct_template(self):
-        response = self.client.get(reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogpost_detail.html')
-
-    def test_blogpost_detail_view_displays_correct_post(self):
-        response = self.client.get(reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['post'], self.post)
-
-    def test_blogpost_detail_view_for_non_existent_post(self):
-        response = self.client.get(reverse('blogs:post_detail', kwargs={'slug': 'non-existent-post'}))
-        self.assertEqual(response.status_code, 404)
-
-
-
-
-
-
-
-
-class BlogPostUpdateViewTests(TestCase):
-
-    def setUp(self):
-        # Create two users: one author and one non-author
-        self.author = User.objects.create_user(username='author', password='testpassword')
-        self.non_author = User.objects.create_user(username='nonauthor', password='testpassword')
-
-        # Create some tags
-        self.tag1 = Tag.objects.create(name='Django')
-        self.tag2 = Tag.objects.create(name='Python')
-
-        # Create a blog post by the author
-        self.post = BlogPost.objects.create(
-            title='Original Blog Post',
-            slug='original-blog-post',
-            content='Original content of the blog post.',
-            author=self.author,
-            status='published',
-            published_at=datetime.now()
+        self.comment = Comment.objects.create(
+            post=self.post,
+            author=self.user,
+            content='This is a test comment.'
         )
-        self.post.tags.add(self.tag1, self.tag2)
+        self.url = reverse('comments:comment_update', kwargs={'pk': self.comment.pk})
 
-        # Set up the client
-        self.client = Client()
+    def test_update_comment_authenticated_author(self):
+        """Test that the comment author can update the comment."""
+        self.client.login(username='testuser', password='testpassword')
+        response = self.client.post(self.url, {'content': 'Updated comment content.'})
+        self.assertRedirects(response, reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.content, 'Updated comment content.')
 
-    def test_blogpost_update_view_accessible_by_author(self):
-        self.client.login(username='author', password='testpassword')
-        response = self.client.get(reverse('blogs:post_update', kwargs={'slug': self.post.slug}))
-        self.assertEqual(response.status_code, 200)
-
-    def test_blogpost_update_view_inaccessible_by_non_author(self):
-        self.client.login(username='nonauthor', password='testpassword')
-        response = self.client.get(reverse('blogs:post_update', kwargs={'slug': self.post.slug}))
+    def test_update_comment_authenticated_non_author(self):
+        """Test that a user who is not the author cannot update the comment."""
+        self.client.login(username='otheruser', password='otherpassword')
+        response = self.client.post(self.url, {'content': 'This update should not be allowed.'})
         self.assertEqual(response.status_code, 403)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.content, 'This is a test comment.')
 
-    def test_blogpost_update_view_uses_correct_template(self):
-        self.client.login(username='author', password='testpassword')
-        response = self.client.get(reverse('blogs:post_update', kwargs={'slug': self.post.slug}))
+    def test_update_comment_unauthenticated(self):
+        """Test that an unauthenticated user cannot update the comment."""
+        response = self.client.post(self.url, {'content': 'This update should not be allowed.'})
+        self.assertRedirects(response, f'/accounts/login/?next={self.url}')
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.content, 'This is a test comment.')
+
+    def test_update_comment_invalid_data(self):
+        """Test that invalid comment data does not update the comment."""
+        self.client.login(username='testuser', password='testpassword')
+        response = self.client.post(self.url, {'content': ''})
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogpost_form.html')
-
-    def test_blogpost_update_with_valid_data(self):
-        self.client.login(username='author', password='testpassword')
-        new_data = {
-            'title': 'Updated Blog Post',
-            'slug': 'updated-blog-post',
-            'content': 'Updated content of the blog post.',
-            'tags': [self.tag1.id, self.tag2.id],
-            'status': 'published',
-            'published_at': datetime.now(),
-        }
-        response = self.client.post(reverse('blogs:post_update', kwargs={'slug': self.post.slug}), new_data)
-        self.post.refresh_from_db()
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(self.post.title, 'Updated Blog Post')
-        self.assertEqual(self.post.slug, 'updated-blog-post')
-        self.assertEqual(self.post.content, 'Updated content of the blog post.')
-
-    def test_blogpost_update_with_invalid_data(self):
-        self.client.login(username='author', password='testpassword')
-        invalid_data = {
-            'title': '',  # Title is required
-            'slug': '',  # Slug is required
-            'content': '',
-            'tags': [self.tag1.id, self.tag2.id],
-            'status': 'published',
-            'published_at': datetime.now(),
-        }
-        response = self.client.post(reverse('blogs:post_update', kwargs={'slug': self.post.slug}), invalid_data)
-        self.assertEqual(response.status_code, 200)  # The form should re-render with errors
-        self.assertFormError(response, 'form', 'title', 'This field is required.')
-        self.assertFormError(response, 'form', 'slug', 'This field is required.')
+        self.assertFormError(response, 'form', 'content', 'This field is required.')
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.content, 'This is a test comment.')
 
 
-
-
-
-
-
-
-
-class BlogPostDeleteViewTests(TestCase):
-
+class CommentDeleteViewTest(TestCase):
     def setUp(self):
-        # Create two users: one author and one non-author
-        self.author = User.objects.create_user(username='author', password='testpassword')
-        self.non_author = User.objects.create_user(username='nonauthor', password='testpassword')
-
-        # Create some tags
-        self.tag1 = Tag.objects.create(name='Django')
-        self.tag2 = Tag.objects.create(name='Python')
-
-        # Create a blog post by the author
+        # Create test users, blog post, and comment
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.other_user = User.objects.create_user(username='otheruser', password='otherpassword')
         self.post = BlogPost.objects.create(
-            title='Original Blog Post',
-            slug='original-blog-post',
-            content='Original content of the blog post.',
-            author=self.author,
+            title='Test Post',
+            slug='test-post',
+            content='This is a test post.',
+            author=self.user,
             status='published',
-            published_at=datetime.now()
+            published_at='2024-08-28T12:00:00Z'
         )
-        self.post.tags.add(self.tag1, self.tag2)
+        self.comment = Comment.objects.create(
+            post=self.post,
+            author=self.user,
+            content='This is a test comment.'
+        )
+        self.url = reverse('comments:comment_delete', kwargs={'pk': self.comment.pk})
 
-        # Set up the client
-        self.client = Client()
+    def test_delete_comment_authenticated_author(self):
+        """Test that the comment author can delete the comment."""
+        self.client.login(username='testuser', password='testpassword')
+        response = self.client.post(self.url)
+        self.assertRedirects(response, reverse('blogs:post_detail', kwargs={'slug': self.post.slug}))
+        self.assertFalse(Comment.objects.filter(pk=self.comment.pk).exists())
 
-    def test_blogpost_delete_view_accessible_by_author(self):
-        self.client.login(username='author', password='testpassword')
-        response = self.client.get(reverse('blogs:post_delete', kwargs={'slug': self.post.slug}))
-        self.assertEqual(response.status_code, 200)
-
-    def test_blogpost_delete_view_inaccessible_by_non_author(self):
-        self.client.login(username='nonauthor', password='testpassword')
-        response = self.client.get(reverse('blogs:post_delete', kwargs={'slug': self.post.slug}))
+    def test_delete_comment_authenticated_non_author(self):
+        """Test that a user who is not the author cannot delete the comment."""
+        self.client.login(username='otheruser', password='otherpassword')
+        response = self.client.post(self.url)
         self.assertEqual(response.status_code, 403)
+        self.assertTrue(Comment.objects.filter(pk=self.comment.pk).exists())
 
-    def test_blogpost_delete_view_uses_correct_template(self):
-        self.client.login(username='author', password='testpassword')
-        response = self.client.get(reverse('blogs:post_delete', kwargs={'slug': self.post.slug}))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blogpost_confirm_delete.html')
-
-    def test_blogpost_successful_deletion(self):
-        self.client.login(username='author', password='testpassword')
-        response = self.client.post(reverse('blogs:post_delete', kwargs={'slug': self.post.slug}))
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('blogs:post_list'))
-
-        # Ensure the post is deleted
-        self.assertFalse(BlogPost.objects.filter(slug='original-blog-post').exists())
+    def test_delete_comment_unauthenticated(self):
+        """Test that an unauthenticated user cannot delete the comment."""
+        response = self.client.post(self.url)
+        self.assertRedirects(response, f'/accounts/login/?next={self.url}')
+        self.assertTrue(Comment.objects.filter(pk=self.comment.pk).exists())

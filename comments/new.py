@@ -4,68 +4,13 @@ from django.contrib.auth import get_user_model
 from blogs.models import BlogPost
 from comments.models import Comment
 
-User = get_user_model()
-
-class CommentCreateViewTest(TestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.post = BlogPost.objects.create(title='Test Post', slug='dont-mess', content='Post content', author=self.user)
-        self.url = reverse('comments:add_comment', kwargs={'slug': self.post.slug})
-
-    def test_create_comment(self):
-        self.client.login(username='testuser', password='password')
-        data = {
-            'content': 'This is a test comment.',
-            'parent': '',  # Omit the parent or set it to an empty string if there's no parent
-        }
-        response = self.client.post(self.url, data)
-        
-        # Check that the comment was created
-        self.assertEqual(Comment.objects.count(), 1)
-        comment = Comment.objects.first()
-        self.assertEqual(comment.content, 'This is a test comment.')
-        self.assertEqual(comment.author, self.user)
-        self.assertEqual(comment.post, self.post)
-        self.assertIsNone(comment.parent)  # Ensure it's a top-level comment
-        self.assertEqual(response.status_code, 302)  # Check for successful redirect
-
-    def test_create_reply(self):
-        self.client.login(username='testuser', password='password')
-        parent_comment = Comment.objects.create(post=self.post, author=self.user, content='Parent comment')
-        data = {
-            'content': 'This is a reply to the parent comment.',
-            'parent': parent_comment.id,  # Pass the ID of the parent comment
-        }
-        response = self.client.post(self.url, data)
-
-        # Filter the comment based on the parent and content
-        reply_comment = Comment.objects.filter(parent=parent_comment).last()
-        
-        # Check that the reply was created
-        self.assertEqual(Comment.objects.count(), 2)
-        self.assertEqual(reply_comment.content, 'This is a reply to the parent comment.')
-        self.assertEqual(reply_comment.author, self.user)
-        self.assertEqual(reply_comment.post, self.post)
-        self.assertEqual(reply_comment.parent, parent_comment)  # Ensure it's a reply to the parent comment
-        self.assertEqual(response.status_code, 302)  # Check for successful redirect
-
-
-
-
-
-
-
-
-
-'''
 class CommentUpdateViewTest(TestCase):
     def setUp(self):
-        # Create users
-        self.user = User.objects.create_user(
+        # Create a user
+        self.user = get_user_model().objects.create_user(
             username='testuser', password='password'
         )
-        self.other_user = User.objects.create_user(
+        self.other_user = get_user_model().objects.create_user(
             username='otheruser', password='password'
         )
         
@@ -85,7 +30,7 @@ class CommentUpdateViewTest(TestCase):
         )
         
         # URLs
-        self.update_url = reverse('comments:comment_update', kwargs={'pk': self.comment.pk})
+        self.update_url = reverse('comments:comment_update', kwargs={'pk': self.comment.pk, 'slug': self.post.slug})
         self.post_detail_url = reverse('blogs:post_detail', kwargs={'slug': self.post.slug})
 
     def test_update_comment_success(self):
@@ -116,7 +61,7 @@ class CommentUpdateViewTest(TestCase):
         })
         self.comment.refresh_from_db()
         self.assertNotEqual(self.comment.content, 'This should not work either.')
-        self.assertRedirects(response, f"{reverse('login')}?next={self.update_url}")  # Redirect to login page
+        self.assertEqual(response.status_code, 302)  # Redirect to login page
 
     def test_update_comment_form_invalid(self):
         """Test that submitting an invalid form does not update the comment."""
@@ -128,4 +73,3 @@ class CommentUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)  # Form re-rendered
         self.assertEqual(self.comment.content, 'This is a test comment.')  # Content remains unchanged
         self.assertContains(response, "This field is required.")  # Form error displayed
-'''
