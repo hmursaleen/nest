@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import dj_database_url
 from pathlib import Path
 import os
 
@@ -24,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-c#f%01dcc$d=tn#2suww3v!32dyuj%ovf%(*&2o7%*^%^a(^pe'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app']
 
 
 # Application definition
@@ -92,6 +93,7 @@ DEFAULT_PAGINATION_CLASS and PAGE_SIZE: Sets the pagination class and the number
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -99,6 +101,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+'''
+Django provides a dedicated module for collecting your project’s static files 
+(HTML, CSS, JavaScript, images, and so on) into a single place for serving in production. 
+This module supports moving files from one place to another, relying on the end web server 
+(such as Render’s default web server, or a tool like NGINX) to serve them to end users.
+'''
 
 ROOT_URLCONF = 'blog.urls'
 
@@ -124,6 +133,7 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+'''
 DATABASES = {
     
     #'default': {
@@ -141,6 +151,26 @@ DATABASES = {
     }
 
 }
+'''
+
+
+DATABASES = {
+'default': dj_database_url.config(default='postgresql://admin:admin@localhost:5432/blogdb', 
+    conn_max_age=600    
+    )}
+
+
+'''
+This connection string assumes that you have PostgreSQL running on localhost, on port 5432, 
+with a database named mysite and a user named postgres with the password postgres.
+'''
+
+
+'''
+psycopg2: This is the most popular Python adapter for communicating with a PostgreSQL database.
+DJ-Database-URL: This enables you to specify your database details via the DATABASE_URL 
+environment variable (you’ll obtain your database’s URL from the Render Dashboard).
+'''
 
 
 # Password validation
@@ -181,8 +211,15 @@ USE_TZ = True
 # URL to use when referring to static files located in STATICFILES_DIRS
 STATIC_URL = '/static/'
 
-# The absolute path to the directory where collectstatic will collect static files for deployment
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# This production code might break development mode, so we check whether we're in DEBUG mode
+if not DEBUG:    # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
+    # and renames the files with unique names for each version to support long-term caching
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+
 
 # Additional locations of static files
 STATICFILES_DIRS = [

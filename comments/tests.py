@@ -129,3 +129,62 @@ class CommentUpdateViewTest(TestCase):
         self.assertEqual(self.comment.content, 'This is a test comment.')  # Content remains unchanged
         self.assertContains(response, "This field is required.")  # Form error displayed
 '''
+
+
+
+
+
+
+
+'''
+class CommentDeleteViewTest(TestCase):
+    def setUp(self):
+        # Create users
+        self.user = User.objects.create_user(
+            username='testuser', password='password'
+        )
+        self.other_user = User.objects.create_user(
+            username='otheruser', password='password'
+        )
+        
+        # Create a blog post
+        self.post = BlogPost.objects.create(
+            title='Test Blog Post',
+            slug='test-blog-post',
+            content='This is a test blog post.',
+            author=self.user
+        )
+        
+        # Create a comment
+        self.comment = Comment.objects.create(
+            post=self.post,
+            author=self.user,
+            content='This is a test comment.'
+        )
+        
+        # URLs
+        self.delete_url = reverse('comments:comment_delete', kwargs={'pk': self.comment.pk})
+        self.post_detail_url = reverse('blogs:post_detail', kwargs={'slug': self.post.slug})
+
+    def test_delete_comment_success(self):
+        """Test that the comment author can successfully delete the comment."""
+        self.client.login(username='testuser', password='password')
+        response = self.client.post(self.delete_url)
+        self.assertRedirects(response, self.post_detail_url)
+        self.assertFalse(Comment.objects.filter(pk=self.comment.pk).exists())
+
+    def test_delete_comment_by_non_author(self):
+        """Test that a user who is not the author cannot delete the comment."""
+        self.client.login(username='otheruser', password='password')
+        response = self.client.post(self.delete_url)
+        self.assertEqual(response.status_code, 403)  # Forbidden
+        self.assertTrue(Comment.objects.filter(pk=self.comment.pk).exists())
+
+    def test_delete_comment_not_logged_in(self):
+        """Test that a user who is not logged in cannot delete the comment."""
+        response = self.client.post(self.delete_url)
+        login_url = reverse('login')
+        expected_url = f"{login_url}?next={self.delete_url}"
+        self.assertRedirects(response, expected_url)
+        self.assertTrue(Comment.objects.filter(pk=self.comment.pk).exists())
+'''

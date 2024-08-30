@@ -94,5 +94,14 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         """Redirect to the post detail page after successful deletion."""
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+        if isinstance(self.object, Comment):
+            return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+        else:
+            # Handle case where deletion is forbidden
+            return reverse_lazy('blogs:post_detail')  # Or another appropriate fallback
 
+
+
+
+    
+    
