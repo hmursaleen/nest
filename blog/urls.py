@@ -45,11 +45,11 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('accounts/', include('authentication.urls')),
+    path('admin/', admin.site.urls),
     path('post/', include('blogs.urls')),
     path('comment/', include('comments.urls')),
-    path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('auth/', include('authentication.urls', namespace='authentication')),
+    
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

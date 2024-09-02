@@ -24,7 +24,7 @@ from django.shortcuts import get_object_or_404
 # ListView to display all published blog posts
 class BlogPostListView(ListView):
     model = BlogPost
-    template_name = 'blogpost_list.html'  # Specify the template to use
+    template_name = 'blogs/blogpost_list.html'  # Specify the template to use
     context_object_name = 'posts'  # Name of the context variable to use in the template
     paginate_by = 10  # Number of posts per page
 
@@ -39,7 +39,7 @@ class BlogPostListView(ListView):
 
 class BlogPostDetailView(DetailView):
     model = BlogPost
-    template_name = 'blogpost_detail.html'
+    template_name = 'blogs/blogpost_detail.html'
     context_object_name = 'post'
 
     def get_context_data(self, **kwargs):
@@ -54,7 +54,7 @@ class BlogPostDetailView(DetailView):
 class BlogPostCreateView(LoginRequiredMixin, CreateView):
     model = BlogPost
     form_class = BlogPostForm
-    template_name = 'blogpost_form.html'
+    template_name = 'blogs/blogpost_form.html'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -73,7 +73,7 @@ class BlogPostCreateView(LoginRequiredMixin, CreateView):
 class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = BlogPost
     form_class = BlogPostUpdateForm  # Use the custom form
-    template_name = 'blogpost_update_form.html'  # Specify the template to use
+    template_name = 'blogs/blogpost_update_form.html'  # Specify the template to use
 
     def get_success_url(self):
         """
@@ -92,7 +92,7 @@ class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 # DeleteView to delete a blog post
 class BlogPostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = BlogPost
-    template_name = 'blogpost_confirm_delete.html'  # Specify the template to use
+    template_name = 'blogs/blogpost_confirm_delete.html'  # Specify the template to use
 
     def get_success_url(self):
         """
@@ -117,7 +117,7 @@ class BlogPostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class TagDetailView(ListView):
     model = BlogPost
-    template_name = 'tag_detail.html'  # Specify the template to use
+    template_name = 'blogs/tag_detail.html'  # Specify the template to use
     context_object_name = 'posts'
     paginate_by = 10  # If you want to paginate the posts
 

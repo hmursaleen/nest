@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'comment_form.html'
+    template_name = 'comments/comment_form.html'
 
     def form_valid(self, form):
         # Assign the author and post to the comment
@@ -53,7 +53,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'comment_update_form.html'
+    template_name = 'comments/comment_update_form.html'
 
     def get_success_url(self):
         # Redirect back to the post detail page after the comment is updated
@@ -83,7 +83,7 @@ from django.http import HttpResponseForbidden
 
 class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
-    template_name = 'comment_confirm_delete.html'
+    template_name = 'comments/comment_confirm_delete.html'
 
     def get_object(self, queryset=None):
         """Ensure that only the author can delete the comment."""
@@ -99,9 +99,3 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
         else:
             # Handle case where deletion is forbidden
             return reverse_lazy('blogs:post_detail')  # Or another appropriate fallback
-
-
-
-
-    
-    

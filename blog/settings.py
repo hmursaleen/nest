@@ -116,11 +116,12 @@ This module supports moving files from one place to another, relying on the end 
 
 ROOT_URLCONF = 'blog.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Add your centralized templates directory here
+        'APP_DIRS': True,  # Enable this to allow loading templates from within apps
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -131,6 +132,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'blog.wsgi.application'
 
@@ -247,6 +249,6 @@ In the example above, the directory static is assumed to be in the root of your 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#LOGIN_REDIRECT_URL = 'post_list'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_REDIRECT_URL = 'blogs:post_list'
+LOGOUT_REDIRECT_URL = 'authentication:login'
 

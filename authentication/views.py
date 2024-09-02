@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from .forms import CustomLoginForm
 from django.shortcuts import render, redirect
@@ -10,7 +10,7 @@ from .forms import SignupForm
 
 
 class CustomLoginView(LoginView):
-    template_name = 'login.html'
+    template_name = 'registration/login.html'
     authentication_form = CustomLoginForm
     redirect_authenticated_user = True
 
@@ -24,7 +24,7 @@ class CustomLoginView(LoginView):
 
 
 class SignupView(View):
-    template_name = 'signup.html'
+    template_name = 'registration/signup.html'
 
     def get(self, request, *args, **kwargs):
         form = SignupForm()
@@ -37,3 +37,14 @@ class SignupView(View):
             login(request, user)  # Log the user in after successful signup
             return redirect(reverse_lazy('blogs:post_list'))  # Redirect to the home page or wherever appropriate
         return render(request, self.template_name, {'form': form})
+
+
+
+
+
+
+
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('login')  # Redirect to the login page after logout
+
