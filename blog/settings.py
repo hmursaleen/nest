@@ -249,6 +249,19 @@ In the example above, the directory static is assumed to be in the root of your 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = 'blogs:post_list'
-LOGOUT_REDIRECT_URL = 'authentication:login'
 
+LOGIN_REDIRECT_URL = 'blogs:post_list'  # Redirect after login
+LOGOUT_REDIRECT_URL = 'authentication:login'  # Redirect after logout
+
+
+
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development, to print emails to the console
+
+# For production, use something like:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'habibulmursaleen@gmail.com'
+EMAIL_HOST_PASSWORD = 'sddv cbbo gbwy aiaq'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

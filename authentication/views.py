@@ -10,7 +10,7 @@ from .forms import SignupForm
 
 
 class CustomLoginView(LoginView):
-    template_name = 'registration/login.html'
+    template_name = 'authentication/login.html'
     authentication_form = CustomLoginForm
     redirect_authenticated_user = True
 
@@ -24,7 +24,7 @@ class CustomLoginView(LoginView):
 
 
 class SignupView(View):
-    template_name = 'registration/signup.html'
+    template_name = 'authentication/signup.html'
 
     def get(self, request, *args, **kwargs):
         form = SignupForm()
