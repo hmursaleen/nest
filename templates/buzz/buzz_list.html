@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Buzz Notifications</h2>
+    <ul class="list-group">
+        {% for buzz in buzzes %}
+        <li class="list-group-item{% if not buzz.is_read %} list-group-item-info{% endif %}">
+            <strong>{{ buzz.trigger.username }}</strong> commented on your post: <strong>{{ buzz.post.title }}</strong><br>
+            {{ buzz.comment.content|truncatewords:20 }}<br>
+            <small class="text-muted">Received on {{ buzz.created_at|date:"F j, Y, g:i a" }}</small>
+            <a href="{% url 'buzz:buzz_detail' pk=buzz.pk %}" class="btn btn-secondary btn-sm float-right">View Details</a>
+            {% if not buzz.is_read %}
+                <a href="{% url 'buzz:mark_buzz_as_read' pk=buzz.pk %}" class="btn btn-primary btn-sm float-right mr-2">Mark as Read</a>
+            {% endif %}
+        </li>
+        {% empty %}
+        <li class="list-group-item">You have no notifications.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

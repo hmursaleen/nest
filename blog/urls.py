@@ -45,9 +45,10 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('accounts/', include('authentication.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('admin/', admin.site.urls),
+    path('buzz/', include('buzz.urls')),
     path('post/', include('blogs.urls')),
     path('comment/', include('comments.urls')),
     path('search/', include('search.urls')),

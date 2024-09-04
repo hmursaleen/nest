@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Buzz Notification</h2>
+<div class="buzz-details">
+    <p><strong>Post:</strong> {{ buzz.post.title }}</p>
+    <p><strong>Comment:</strong> {{ buzz.comment.content }}</p>
+    <p><strong>Trigger:</strong> {{ buzz.trigger.username }}</p>
+    <p><strong>Created At:</strong> {{ buzz.created_at }}</p>
+    {% if not buzz.is_read %}
+        <a href="{% url 'buzz:mark_buzz_as_read' pk=buzz.pk %}" class="btn btn-primary btn-sm float-right mr-2">Mark as Read</a>
+    {% endif %}
+</div>
+{% endblock %}
