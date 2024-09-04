@@ -8,7 +8,7 @@ app_name = 'authentication'
 
 urlpatterns = [
     path('login/', LoginView.as_view(template_name='authentication/login.html'), name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    path('logout/', LogoutView.as_view(template_name='authentication/login.html'), name='logout'),
     path('signup/', CreateView.as_view(
         template_name='authentication/signup.html',
         form_class=SignupForm,

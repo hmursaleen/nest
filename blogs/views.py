@@ -44,8 +44,10 @@ class BlogPostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = self.object.comments.filter(parent__isnull=True)  # Get top-level comments
+        # Fetch only top-level comments (comments with no parent)
+        context['comments'] = self.object.comments.filter(parent__isnull=True)
         return context
+
 
 
 

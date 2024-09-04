@@ -44,12 +44,18 @@
                     </li>
                 {% endif %}
             </ul>
+            <!-- Search Form -->
+            <form id="search-form" class="form-inline my-2 my-lg-0" method="get" action="{% url 'search:search' %}">
+                <input id="id_query" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="query">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
         </div>
     </nav>
 
     <!-- Content -->
     <div class="container mt-4">
         {% block content %}{% endblock %}
+        <div id="search-results" class="mt-3"></div>
     </div>
 
     <!-- Footer -->
@@ -66,6 +72,28 @@
 
     <!-- Select2 JS from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js"></script>
+
+    <!-- JavaScript for dynamic search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('#id_query');
+            const resultsDiv = document.getElementById('search-results');
+
+            searchInput.addEventListener('input', function() {
+                const query = searchInput.value;
+                if (query.length > 2) {  // Trigger search only after 3 characters
+                    fetch(`{% url 'search:search_ajax' %}?query=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            resultsDiv.innerHTML = data.html;
+                        })
+                        .catch(error => console.error('Error:', error));
+                } else {
+                    resultsDiv.innerHTML = '';  // Clear results if less than 3 characters
+                }
+            });
+        });
+    </script>
 
     {% block extra_scripts %}{% endblock %}
 </body>

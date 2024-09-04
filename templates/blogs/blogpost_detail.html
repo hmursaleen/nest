@@ -47,7 +47,7 @@
 
             <hr>
 
-            {% include 'display_comments.html' %}
+            {% include 'comments/display_comments.html' with comments=post.comments.all %}
 
         </div>
     </div>

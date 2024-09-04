@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Reply to Comment{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>Reply to Comment</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Reply</button>
+            <a href="{% url 'blogs:post_detail' slug=post_slug %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

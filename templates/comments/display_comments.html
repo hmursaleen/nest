@@ -11,20 +11,30 @@
 
                         <p>{{ comment.content }}</p>
 
+                        {% if request.user != comment.author %}
+                            <a href="{% url 'comments:reply_comment' pk=comment.pk %}" class="btn btn-sm btn-secondary">Reply</a>
+                        {% endif %}
+
                         {% if request.user == comment.author %}
                             <a href="{% url 'comments:comment_update' pk=comment.pk %}" class="btn btn-sm btn-warning">Edit</a>
                             <a href="{% url 'comments:comment_delete' pk=comment.pk %}" class="btn btn-sm btn-danger">Delete</a>
                         {% endif %}
 
-                        {% if comment.replies.all %}
+                        <!-- Display Replies -->
+                        {% if comment.replies.exists %}
                             <ul class="list-unstyled mt-3 ml-5">
                                 {% for reply in comment.replies.all %}
                                     <li class="media mb-3">
                                         <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
                                         <div class="media-body">
                                             <h5 class="mt-0 mb-1">{{ reply.author }}</h5>
-                                            <p>{{ reply.content }}</p>
                                             <small class="text-muted">{{ reply.created_at|date:"F j, Y, g:i a" }}</small>
+                                            <p>{{ reply.content }}</p>
+                                            
+                                            {% if request.user == reply.author %}
+                                                <a href="{% url 'comments:comment_update' pk=reply.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                                                <a href="{% url 'comments:comment_delete' pk=reply.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                                            {% endif %}
                                         </div>
                                     </li>
                                 {% endfor %}
@@ -37,6 +47,5 @@
     {% else %}
         <p class="text-muted">No comments yet. Be the first to comment!</p>
     {% endif %}
-
     <a href="{% url 'comments:add_comment' slug=post.slug %}" class="btn btn-success">Add Comment</a>
 </div>

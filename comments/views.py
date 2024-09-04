@@ -3,9 +3,15 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Comment
 from .forms import CommentForm
 from blogs.models import BlogPost
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404, redirect
 
 
+    
+    
+    
+
+    
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -39,10 +45,10 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     '''
     form_valid: Automatically sets the author and post fields before saving the form.
-	get_success_url: Redirects the user back to the blog post detail page after the comment is submitted.
-	get_post: Retrieves the post associated with the comment using the slug from the URL.
-	get_context_data: Passes the post object to the template context for displaying post-specific information.
-	'''
+    get_success_url: Redirects the user back to the blog post detail page after the comment is submitted.
+    get_post: Retrieves the post associated with the comment using the slug from the URL.
+    get_context_data: Passes the post object to the template context for displaying post-specific information.
+    '''
 
 
 
@@ -92,10 +98,38 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
             return HttpResponseForbidden("You do not have permission to delete this comment.")
         return obj
 
+
     def get_success_url(self):
         """Redirect to the post detail page after successful deletion."""
-        if isinstance(self.object, Comment):
-            return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
-        else:
-            # Handle case where deletion is forbidden
-            return reverse_lazy('blogs:post_detail')  # Or another appropriate fallback
+        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+
+
+
+
+
+
+
+
+
+
+class ReplyCreateView(CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'comments/reply_form.html'
+
+    def form_valid(self, form):
+        parent_comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
+        form.instance.parent = parent_comment
+        form.instance.post = parent_comment.post
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        parent_comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
+        context['post_slug'] = parent_comment.post.slug
+        return context
+

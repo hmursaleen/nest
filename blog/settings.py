@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'blogs.apps.BlogsConfig',
     'comments.apps.CommentsConfig',
     'core.apps.CoreConfig',
+    'search.apps.SearchConfig',
     'authentication.apps.AuthenticationConfig',
     'rest_framework',
     'drf_yasg',
