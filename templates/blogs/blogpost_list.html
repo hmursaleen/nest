@@ -3,83 +3,79 @@
 {% block title %}Blog Posts{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Blog Posts</h1>
+<div class="container mx-auto mt-8">
+    <h1 class="text-4xl font-bold mb-6">Blog Posts</h1>
 
     {% if posts %}
-        <div class="row">
+        <div class="space-y-8">  <!-- Vertical spacing between posts -->
             {% for post in posts %}
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h3 class="card-title">
-                                <a href="{% url 'blogs:post_detail' post.slug %}">{{ post.title }}</a>
-                            </h3>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    By {{ post.author }} | Published on {{ post.published_at|date:"F j, Y" }}
-                                </small>
-                            </p>
-                            <p class="card-text">
-                                {{ post.content|truncatewords:30 }}
-                            </p>
-                            <p class="card-text">
-                                <strong>Tags:</strong>
-                                {% for tag in post.tags.all %}
-                                    <a href="{% url 'blogs:tag_detail' tag.name %}" class="badge badge-secondary">{{ tag.name }}</a>
-                                {% empty %}
-                                    <span class="text-muted">No tags</span>
-                                {% endfor %}
-                            </p>
-                        </div>
-                        <div class="card-footer text-muted">
-                            <a href="{% url 'blogs:post_detail' post.slug %}" class="btn btn-primary">Read More</a>
-                        </div>
-                    </div>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-semibold mb-2">
+                    <a href="{% url 'blogs:post_detail' post.slug %}" class="text-blue-500 hover:underline">{{ post.title }}</a>
+                </h2>
+                <p class="text-sm text-gray-600">
+                    By {{ post.author }} | Published on {{ post.published_at|date:"F j, Y" }}
+                </p>
+
+                <div class="mt-4 mb-4">
+                    <!-- Show a truncated version of content (10 lines max) -->
+                    <p class="line-clamp-10">{{ post.content }}</p>
                 </div>
+
+                <!-- Tags -->
+                <div class="mt-4">
+                    <span class="font-semibold">Tags: </span>
+                    {% for tag in post.tags.all %}
+                        <a href="{% url 'blogs:tag_detail' tag.name %}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{{ tag.name }}</a>
+                    {% empty %}
+                        <span class="text-gray-500">No tags</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Read More button (only if content exceeds the display limit) -->
+                <div class="mt-4">
+                    <a href="{% url 'blogs:post_detail' post.slug %}" class="text-blue-500 hover:underline">Read More</a>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                {% if posts.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
-                        </a>
+        <div class="mt-8">
+            <nav aria-label="Page navigation">
+                <ul class="flex justify-center space-x-4">
+                    {% if posts.has_previous %}
+                    <li>
+                        <a class="px-3 py-2 rounded-md bg-blue-500 text-white" href="?page=1" aria-label="First">&laquo;&laquo;</a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
+                    <li>
+                        <a class="px-3 py-2 rounded-md bg-blue-500 text-white" href="?page={{ posts.previous_page_number }}" aria-label="Previous">&laquo;</a>
                     </li>
-                {% endif %}
-
-                {% for page_num in posts.paginator.page_range %}
-                    {% if posts.number == page_num %}
-                        <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a></li>
                     {% endif %}
-                {% endfor %}
 
-                {% if posts.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
+                    {% for page_num in posts.paginator.page_range %}
+                        {% if posts.number == page_num %}
+                        <li class="px-3 py-2 bg-blue-500 text-white rounded-md">{{ page_num }}</li>
+                        {% else %}
+                        <li>
+                            <a class="px-3 py-2 rounded-md border" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if posts.has_next %}
+                    <li>
+                        <a class="px-3 py-2 rounded-md bg-blue-500 text-white" href="?page={{ posts.next_page_number }}" aria-label="Next">&raquo;</a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ posts.paginator.num_pages }}" aria-label="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
-                        </a>
+                    <li>
+                        <a class="px-3 py-2 rounded-md bg-blue-500 text-white" href="?page={{ posts.paginator.num_pages }}" aria-label="Last">&raquo;&raquo;</a>
                     </li>
-                {% endif %}
-            </ul>
-        </nav>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     {% else %}
-        <p class="text-center">No blog posts have been published yet.</p>
+        <p class="text-center text-gray-600">No blog posts have been published yet.</p>
     {% endif %}
 </div>
 {% endblock %}

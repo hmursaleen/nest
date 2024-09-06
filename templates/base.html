@@ -1,87 +1,75 @@
-<!-- blogs/templates/base.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Blog{% endblock %}</title>
+    <title>{% block title %}BingeBlog{% endblock %}</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
-    <!-- Select2 CSS from CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-    <!-- Custom CSS -->
+    <!-- Custom CSS (if any) -->
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="bg-gray-100">
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{% url 'blogs:post_list' %}">My Blog</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'blogs:post_list' %}">Home</a>
-                </li>
-                {% if user.is_authenticated %}
-
-                    <div class="navbar-nav">
-                        <a class="nav-item nav-link" href="{% url 'buzz:buzz_list' %}"> Buzz
-                            <i class="fa fa-bell"></i>
-                            {% if unread_buzz_count > 0 %}
-                                <span class="badge badge-danger">{{ unread_buzz_count }}</span>
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="{% url 'core:home' %}" class="text-2xl font-bold text-indigo-600">BingeBlog</a>
+                </div>
+                <div class="flex items-center">
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="{% url 'core:home' %}" class="text-gray-700 hover:text-indigo-500">Home</a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'buzz:buzz_list' %}" class="text-gray-700 hover:text-indigo-500 relative">
+                                    Buzz
+                                    <i class="fas fa-bell"></i>
+                                    {% if unread_buzz_count > 0 %}
+                                        <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                                            {{ unread_buzz_count }}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'blogs:post_create' %}" class="text-gray-700 hover:text-indigo-500">Create Post</a>
+                                <a href="{% url 'authentication:logout' %}" class="text-gray-700 hover:text-red-500">Logout</a>
+                            {% else %}
+                                <a href="{% url 'authentication:login' %}" class="text-gray-700 hover:text-indigo-500">Login</a>
+                                <a href="{% url 'authentication:signup' %}" class="text-gray-700 hover:text-indigo-500">Sign Up</a>
                             {% endif %}
-                        </a>
+                        </div>
                     </div>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'blogs:post_create' %}">Create Post</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'authentication:logout' %}">Logout</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'authentication:login' %}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'authentication:signup' %}">Sign Up</a>
-                    </li>
-                {% endif %}
-            </ul>
-            <!-- Search Form -->
-            <form id="search-form" class="form-inline my-2 my-lg-0" method="get" action="{% url 'search:search' %}">
-                <input id="id_query" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="query">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
+                </div>
+                <div class="flex">
+                    <!-- Search Form -->
+                    <form id="search-form" method="get" action="{% url 'search:search' %}" class="relative">
+                        <input id="id_query" class="appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="search" placeholder="Search..." name="query">
+                        <button class="absolute inset-y-0 right-0 flex items-center px-4 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg">
+                            Search
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- Content -->
-    <div class="container mt-4">
-        {% block content %}{% endblock %}
-        <div id="search-results" class="mt-3"></div>
+    <!-- Content Section (Medium-like style) -->
+    <div class="bg-gray-50 py-8">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 bg-white p-8 shadow-md rounded-lg">
+            {% block content %}{% endblock %}
+            <div id="search-results" class="mt-4"></div>
+        </div>
     </div>
 
     <!-- Footer -->
-    <footer class="footer bg-light text-center py-3 mt-4">
-        <div class="container">
-            <span class="text-muted">© 2024 My Blog</span>
+    <footer class="bg-white border-t mt-12 py-4">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500">
+            © 2024 BingeBlog
         </div>
     </footer>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <!-- Select2 JS from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js"></script>
 
     <!-- JavaScript for dynamic search -->
     <script>
@@ -105,6 +93,7 @@
         });
     </script>
 
+    <!-- Additional Scripts -->
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
