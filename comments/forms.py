@@ -7,8 +7,8 @@ class CommentForm(forms.ModelForm):
         fields = ['content', 'parent']  # Include 'parent' for replies
         widgets = {
             'content': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 3,
+                'class': 'w-full border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-indigo-200 focus:border-indigo-300 p-3',  # Tailwind CSS for visible borders and responsive width
+                'rows': 3,  # Make the textarea taller
                 'placeholder': 'Write your comment here...'
             }),
             'parent': forms.HiddenInput(),  # Hide the parent field in the form

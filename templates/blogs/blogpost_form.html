@@ -5,34 +5,57 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h2>Create a New Blog Post</h2>
-            <hr>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                
-                {{ form.as_p }}  <!-- This will render the form with the defined widgets -->
+<div class="bg-gray-50 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 bg-white p-8 shadow-md rounded-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Create a New Blog Post</h2>
+        <hr class="my-4">
 
-                <button type="submit" class="btn btn-primary">Create Post</button>
-                <a href="{% url 'blogs:post_list' %}" class="btn btn-secondary">Cancel</a>
-            </form>
-        </div>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            <div class="space-y-4">
+                <!-- Render each form field with Tailwind CSS classes -->
+                <div class="mb-4">
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.title.label }}</label>
+                    <div class="mt-1">
+                        {{ form.title|add_class:"form-input" }}
+                        {% if form.title.errors %}
+                        <p class="mt-1 text-red-600 text-sm">{{ form.title.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="{{ form.content.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.content.label }}</label>
+                    <div class="mt-1">
+                        {{ form.content|add_class:"form-input" }}
+                        {% if form.content.errors %}
+                        <p class="mt-1 text-red-600 text-sm">{{ form.content.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.tags.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.tags.label }}</label>
+                    <div class="mt-1">
+                        {{ form.tags|add_class:"form-input" }}
+                        {% if form.tags.errors %}
+                        <p class="mt-1 text-red-600 text-sm">{{ form.tags.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 mt-6">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition duration-200">
+                    Create Post
+                </button>
+                <a href="{% url 'blogs:post_list' %}" class="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-700 transition duration-200">
+                    Cancel
+                </a>
+            </div>
+        </form>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
-    {{ block.super }}
-    <script>
-        $(document).ready(function() {
-            // Initialize Select2 on the tags field
-            $('#id_tags').select2({
-                placeholder: "Select tags",
-                allowClear: true,
-            });
-        });
-    </script>
 {% endblock %}

@@ -1,14 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Buzz Notification</h2>
-<div class="buzz-details">
-    <p><strong>Post:</strong> {{ buzz.post.title }}</p>
-    <p><strong>Comment:</strong> {{ buzz.comment.content }}</p>
-    <p><strong>Trigger:</strong> {{ buzz.trigger.username }}</p>
-    <p><strong>Created At:</strong> {{ buzz.created_at }}</p>
-    {% if not buzz.is_read %}
-        <a href="{% url 'buzz:mark_buzz_as_read' pk=buzz.pk %}" class="btn btn-primary btn-sm float-right mr-2">Mark as Read</a>
-    {% endif %}
+<div class="bg-gray-50 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 bg-white p-8 shadow-md rounded-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Buzz Detail</h2>
+        
+        <div class="space-y-4 text-gray-700">
+            <p><strong>Post:</strong> <span class="text-blue-600">{{ buzz.post.title }}</span></p>
+            <p><strong>Comment:</strong> <span class="italic">{{ buzz.comment.content }}</span></p>
+            <p><strong>Trigger:</strong> <span class="text-gray-800 font-medium">{{ buzz.trigger.username }}</span></p>
+            <p><strong>Created At:</strong> {{ buzz.created_at|date:"M d, Y H:i" }}</p>
+        </div>
+        
+        {% if not buzz.is_read %}
+            <div class="mt-6">
+                <a href="{% url 'buzz:mark_buzz_as_read' pk=buzz.pk %}" 
+                   class="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Mark as Read
+                </a>
+            </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
