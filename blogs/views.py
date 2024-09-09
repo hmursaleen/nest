@@ -33,7 +33,9 @@ class BlogPostListView(ListView):
         Override this method to filter the queryset to only show published posts,
         ordered by creation date in descending order.
         """
-        return BlogPost.objects.filter(status='published').order_by('-created_at')
+        #return BlogPost.objects.filter(status='published').order_by('-created_at')
+        return BlogPost.objects.order_by('-created_at')
+
 
 
 
@@ -63,7 +65,7 @@ class BlogPostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.slug})
+        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.pk})
 
 
 
@@ -81,7 +83,7 @@ class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """
         Redirect to the detail view of the updated post.
         """
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.slug})
+        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.pk})
 
     def test_func(self):
         post = self.get_object()

@@ -1,5 +1,3 @@
-# blogs/models.py
-
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User  # Import the User model for author field
@@ -34,7 +32,7 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=200, help_text="Enter the title of the blog post")
 
     # Slug for the blog post (useful for URLs)
-    slug = models.SlugField(unique=True, max_length=200)
+    #slug = models.SlugField(unique=True, max_length=200)
 
     # The main content of the blog post
     content = models.TextField(help_text="Enter the content of the blog post")
@@ -48,11 +46,11 @@ class BlogPost(models.Model):
     # Date and time when the post was last updated
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Optional: Published date (if you want to control when posts go live)
-
-    is_published = models.BooleanField(default=False)
-
     tags = models.ManyToManyField(Tag, blank=True, related_name='blog_posts')
+
+    # Optional: Published date (if you want to control when posts go live)
+    '''
+    is_published = models.BooleanField(default=False)
 
     published_at = models.DateTimeField(blank=True, null=True)
 
@@ -62,6 +60,7 @@ class BlogPost(models.Model):
         ('published', 'Published'),
     )
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    '''
 
     # Metadata (like ordering)
     class Meta:
@@ -79,8 +78,9 @@ class BlogPost(models.Model):
         from django.urls import reverse
         return reverse('blogs:post_detail', kwargs={'slug': self.slug})
 
-
+    '''
     def publish(self):
         self.is_published = True
         #self.published_at = models.DateTimeField(auto_now_add=True)
         self.save()
+    '''

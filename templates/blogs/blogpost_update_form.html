@@ -22,14 +22,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="id_slug">Slug</label>
-                    {{ form.slug }}
-                    <div class="form-text text-muted">
-                        Enter a URL-friendly slug for your blog post. This should be unique.
-                    </div>
-                </div>
-
+                
                 <div class="form-group">
                     <label for="id_content">Content</label>
                     {{ form.content }}
@@ -63,7 +56,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Update Post</button>
-                <a href="{% url 'blogs:post_detail' slug=form.instance.slug %}" class="btn btn-secondary">Cancel</a>
+                <a href="{% url 'blogs:post_detail' pk=form.instance.pk %}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
     </div>

@@ -4,7 +4,7 @@ from .views import CommentCreateView, CommentUpdateView, CommentDeleteView, Repl
 app_name = 'comments'
 
 urlpatterns = [
-    path('post/<slug:slug>', CommentCreateView.as_view(), name='add_comment'),
+    path('post/<int:pk>', CommentCreateView.as_view(), name='add_comment'),
     path('<int:pk>/update/', CommentUpdateView.as_view(), name='comment_update'),
     path('<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
     path('<int:pk>/reply/', ReplyCreateView.as_view(), name='reply_comment'),

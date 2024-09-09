@@ -15,7 +15,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="{% url 'blogs:post_detail' slug=post.slug %}">
+                                <a href="{% url 'blogs:post_detail' pk=post.pk %}">
                                     {{ post.title }}
                                 </a>
                             </h5>

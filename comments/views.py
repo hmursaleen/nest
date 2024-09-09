@@ -31,11 +31,11 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         # Redirect back to the post detail page after a comment is added
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.get_post().slug})
+        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.get_post().pk})
 
     def get_post(self):
         # Get the post object that this comment is associated with
-        return BlogPost.objects.get(slug=self.kwargs['slug'])
+        return BlogPost.objects.get(pk=self.kwargs['pk'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -63,7 +63,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         # Redirect back to the post detail page after the comment is updated
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.post.pk})
 
     def test_func(self):
         # Ensure that the user is the author of the comment
@@ -72,7 +72,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def handle_no_permission(self):
         # Customize the response if the user fails the test (e.g., redirect to the post)
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.get_object().post.slug})
+        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.post.pk})
 
         '''
         handle_no_permission Method: This method handles what happens if the user doesn't pass 
@@ -101,7 +101,7 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         """Redirect to the post detail page after successful deletion."""
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.post.pk})
 
 
 
@@ -116,6 +116,7 @@ class ReplyCreateView(CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'comments/reply_form.html'
+    
 
     def form_valid(self, form):
         parent_comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
@@ -125,11 +126,14 @@ class ReplyCreateView(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('blogs:post_detail', kwargs={'slug': self.object.post.slug})
+        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.post.pk})
 
+    '''
+    def get_post(self):
+        # Get the post object that this comment is associated with
+        return BlogPost.objects.get(pk=self.object.post.pk)
+    '''
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        parent_comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
-        context['post_slug'] = parent_comment.post.slug
+        context['comment'] = get_object_or_404(Comment, pk=self.kwargs['pk'])
         return context
-

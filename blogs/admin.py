@@ -5,9 +5,9 @@ from .models import BlogPost, Tag
 
 @admin.register(BlogPost)
 class BlogPostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'status', 'created_at', 'updated_at')
-    prepopulated_fields = {'slug': ('title',)}
-    list_filter = ('status', 'author', 'tags')
+    list_display = ('title', 'author', 'created_at', 'updated_at')
+    #prepopulated_fields = {'slug': ('title',)}
+    list_filter = ('author', 'tags')
     search_fields = ('title', 'content')
     ordering = ['-created_at']
 

@@ -1,51 +1,77 @@
-<div class="comments-section">
-    <h3>Comments</h3>
+<div class="comments-section mt-8">
+    <h3 class="text-2xl font-semibold mb-6">Comments</h3>
+
     {% if comments %}
-        <ul class="list-unstyled">
+        <ul class="space-y-8">
             {% for comment in comments %}
-                <li class="media mb-4">
-                    <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
-                    <div class="media-body">
-                        <h5 class="mt-0 mb-1">{{ comment.author }}</h5>
-                        <small class="text-muted">{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
+                <li class="p-6 bg-gray-100 rounded-lg shadow-md">
+                    <div class="flex items-start">
+                        <!-- User Image -->
+                        <img class="w-10 h-10 rounded-full mr-4" src="https://via.placeholder.com/50" alt="User image">
+                        <div class="w-full">
+                            <!-- Comment Header -->
+                            <div class="flex justify-between items-center">
+                                <h5 class="text-lg font-semibold">{{ comment.author }}</h5>
+                                <small class="text-gray-500">{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
+                            </div>
 
-                        <p>{{ comment.content }}</p>
+                            <!-- Comment Content -->
+                            <p class="mt-2 text-gray-800">{{ comment.content }}</p>
 
-                        {% if request.user != comment.author %}
-                            <a href="{% url 'comments:reply_comment' pk=comment.pk %}" class="btn btn-sm btn-secondary">Reply</a>
-                        {% endif %}
+                            <!-- Action Buttons (Reply, Edit, Delete) -->
+                            <div class="mt-4 space-x-2">
+                                {% if request.user != comment.author %}
+                                    <a href="{% url 'comments:reply_comment' pk=comment.pk %}" class="text-blue-500 hover:underline text-sm">Reply</a>
+                                {% endif %}
 
-                        {% if request.user == comment.author %}
-                            <a href="{% url 'comments:comment_update' pk=comment.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="{% url 'comments:comment_delete' pk=comment.pk %}" class="btn btn-sm btn-danger">Delete</a>
-                        {% endif %}
+                                {% if request.user == comment.author %}
+                                    <a href="{% url 'comments:comment_update' pk=comment.pk %}" class="text-yellow-500 hover:underline text-sm">Edit</a>
+                                    <a href="{% url 'comments:comment_delete' pk=comment.pk %}" class="text-red-500 hover:underline text-sm">Delete</a>
+                                {% endif %}
+                            </div>
 
-                        <!-- Display Replies -->
-                        {% if comment.replies.exists %}
-                            <ul class="list-unstyled mt-3 ml-5">
-                                {% for reply in comment.replies.all %}
-                                    <li class="media mb-3">
-                                        <img class="mr-3 rounded-circle" src="https://via.placeholder.com/50" alt="User image">
-                                        <div class="media-body">
-                                            <h5 class="mt-0 mb-1">{{ reply.author }}</h5>
-                                            <small class="text-muted">{{ reply.created_at|date:"F j, Y, g:i a" }}</small>
-                                            <p>{{ reply.content }}</p>
-                                            
-                                            {% if request.user == reply.author %}
-                                                <a href="{% url 'comments:comment_update' pk=reply.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                                                <a href="{% url 'comments:comment_delete' pk=reply.pk %}" class="btn btn-sm btn-danger">Delete</a>
-                                            {% endif %}
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
+                            <!-- Display Replies -->
+                            {% if comment.replies.exists %}
+                                <ul class="mt-6 space-y-4 pl-6 border-l-2 border-gray-200">
+                                    {% for reply in comment.replies.all %}
+                                        <li class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                                            <div class="flex items-start">
+                                                <!-- Reply User Image -->
+                                                <img class="w-8 h-8 rounded-full mr-3" src="https://via.placeholder.com/50" alt="User image">
+                                                <div class="w-full">
+                                                    <!-- Reply Header -->
+                                                    <div class="flex justify-between items-center">
+                                                        <h5 class="text-md font-medium">{{ reply.author }}</h5>
+                                                        <small class="text-gray-500">{{ reply.created_at|date:"F j, Y, g:i a" }}</small>
+                                                    </div>
+
+                                                    <!-- Reply Content -->
+                                                    <p class="mt-2 text-gray-700">{{ reply.content }}</p>
+
+                                                    <!-- Action Buttons (Edit, Delete) -->
+                                                    <div class="mt-2 space-x-2">
+                                                        {% if request.user == reply.author %}
+                                                            <a href="{% url 'comments:comment_update' pk=reply.pk %}" class="text-yellow-500 hover:underline text-sm">Edit</a>
+                                                            <a href="{% url 'comments:comment_delete' pk=reply.pk %}" class="text-red-500 hover:underline text-sm">Delete</a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
                     </div>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p class="text-muted">No comments yet. Be the first to comment!</p>
+        <p class="text-gray-500 text-center">No comments yet. Be the first to comment!</p>
     {% endif %}
-    <a href="{% url 'comments:add_comment' slug=post.slug %}" class="btn btn-success">Add Comment</a>
+
+    <!-- Add Comment Button -->
+    <div class="mt-6">
+        <a href="{% url 'comments:add_comment' pk=post.pk %}" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Add Comment</a>
+    </div>
 </div>
