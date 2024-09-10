@@ -4,17 +4,24 @@ from .models import BlogPost, Tag
 from django_select2.forms import Select2MultipleWidget
 
 
+
 class BlogPostForm(forms.ModelForm):
     class Meta:
         model = BlogPost
         fields = ['title', 'content', 'tags']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            #'slug': forms.TextInput(attrs={'class': 'form-control'}),
-            'content': forms.Textarea(attrs={'class': 'form-control'}),
-            'tags': Select2MultipleWidget(attrs={'class': 'form-control'}),
-            #'status': forms.Select(attrs={'class': 'form-control'}),
-            #'published_at': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'title': forms.TextInput(attrs={
+                'class': 'form-control w-full border border-gray-300 rounded-md shadow-sm',
+                'placeholder': 'Enter post title here',
+            }),
+            'content': forms.Textarea(attrs={
+                'class': 'form-control w-full border border-gray-300 rounded-md shadow-sm',
+                'rows': 6,
+                'placeholder': 'Write your content here...',
+            }),
+            'tags': Select2MultipleWidget(attrs={
+                'class': 'form-control border border-gray-300 rounded-md shadow-sm',
+            }),
         }
 
     '''
@@ -25,46 +32,6 @@ class BlogPostForm(forms.ModelForm):
             raise forms.ValidationError("A post with this slug already exists.")
         return slug
     '''
-
-
-    def clean_tags(self):
-        tags = self.cleaned_data.get('tags')
-        if not tags:
-            raise forms.ValidationError("Please select at least one tag.")
-        return tags
-
-
-
-
-
-
-
-
-
-class BlogPostUpdateForm(forms.ModelForm):
-    class Meta:
-        model = BlogPost
-        fields = ['title', 'content', 'tags']
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            #'slug': forms.TextInput(attrs={'class': 'form-control'}),
-            'content': forms.Textarea(attrs={'class': 'form-control'}),
-            'tags': Select2MultipleWidget(attrs={'class': 'form-control'}),
-            #'status': forms.Select(attrs={'class': 'form-control'}),
-            #'published_at': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-        }
-
-    '''
-    def clean_slug(self):
-        """
-        Ensure the slug is unique and valid.
-        """
-        slug = self.cleaned_data['slug']
-        if BlogPost.objects.exclude(pk=self.instance.pk).filter(slug=slug).exists():
-            raise forms.ValidationError("A post with this slug already exists.")
-        return slug
-    '''
-
 
 
     def clean_tags(self):

@@ -18,7 +18,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import BlogPost, Tag
-from .forms import BlogPostForm, BlogPostUpdateForm
+from .forms import BlogPostForm
 from django.shortcuts import get_object_or_404
 
 # ListView to display all published blog posts
@@ -76,7 +76,7 @@ class BlogPostCreateView(LoginRequiredMixin, CreateView):
 # UpdateView to update an existing blog post
 class BlogPostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = BlogPost
-    form_class = BlogPostUpdateForm  # Use the custom form
+    form_class = BlogPostForm  # Use the custom form
     template_name = 'blogs/blogpost_update_form.html'  # Specify the template to use
 
     def get_success_url(self):
