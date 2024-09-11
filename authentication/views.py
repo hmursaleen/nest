@@ -1,11 +1,9 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
-from .forms import CustomLoginForm
+from .forms import CustomLoginForm, SignupForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from django.urls import reverse_lazy
 from django.views import View
-from .forms import SignupForm
 
 
 
@@ -25,6 +23,7 @@ class CustomLoginView(LoginView):
 
 class SignupView(View):
     template_name = 'authentication/signup.html'
+    authentication_form = SignupForm
 
     def get(self, request, *args, **kwargs):
         form = SignupForm()
@@ -46,5 +45,10 @@ class SignupView(View):
 
 
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('login')  # Redirect to the login page after logout
+    template_name = 'authentication/logout.html'
+    next_page = reverse_lazy('login')
+
+    def get(self, request, *args, **kwargs):
+        # Render the logout confirmation page when accessed via GET
+        return render(request, 'authentication/logout_confirm.html') # Redirect to the login page after logout
 
