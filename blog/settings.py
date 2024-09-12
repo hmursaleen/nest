@@ -26,12 +26,17 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+#SECRET_KEY = os.getenv("SECRET_KEY")
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-c#f%01dcc$d=tn#2suww3v!32dyuj%ovf%(*&2o7%*^%^a(^pe')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-DEBUG = False
+#DEBUG = False
+
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'bingeblog.up.railway.app']
 
@@ -167,7 +172,7 @@ DATABASES = {
 
 
 if not DEBUG:
-    DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'), conn_max_age=1800)
+    DATABASES['default'] = dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=500, conn_health_checks=True,)
 
 
 '''
