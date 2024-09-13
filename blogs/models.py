@@ -15,13 +15,6 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-    '''
-    def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse('blogs:tag_detail', kwargs={'name': self.name})
-    '''
-
-
 
 
 
@@ -30,9 +23,6 @@ class Tag(models.Model):
 class BlogPost(models.Model):
     # Title of the blog post
     title = models.CharField(max_length=200, help_text="Enter the title of the blog post")
-
-    # Slug for the blog post (useful for URLs)
-    #slug = models.SlugField(unique=True, max_length=200)
 
     # The main content of the blog post
     content = models.TextField(help_text="Enter the content of the blog post")
@@ -48,20 +38,6 @@ class BlogPost(models.Model):
 
     tags = models.ManyToManyField(Tag, blank=True, related_name='blog_posts')
 
-    # Optional: Published date (if you want to control when posts go live)
-    '''
-    is_published = models.BooleanField(default=False)
-
-    published_at = models.DateTimeField(blank=True, null=True)
-
-    # Optional: A field to manage the status of the post (draft or published)
-    STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('published', 'Published'),
-    )
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
-    '''
-
     # Metadata (like ordering)
     class Meta:
         ordering = ['-created_at']
@@ -72,15 +48,3 @@ class BlogPost(models.Model):
     def __str__(self):
         return self.title
         #i want to write return f'{self.author} posted about {self.title}'
-
-    # Method to get the absolute URL of a blog post (useful for linking)
-    def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse('blogs:post_detail', kwargs={'slug': self.slug})
-
-    '''
-    def publish(self):
-        self.is_published = True
-        #self.published_at = models.DateTimeField(auto_now_add=True)
-        self.save()
-    '''

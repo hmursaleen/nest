@@ -11,7 +11,7 @@ from .models import BlogPost, Tag
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ['id', 'name', 'slug']
+        fields = ['id', 'name']
         #fields: Specifies the fields to be included in the serialized output
 
 class BlogPostSerializer(serializers.ModelSerializer):
@@ -20,4 +20,4 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlogPost
-        fields = ['id', 'title', 'slug', 'content', 'author', 'tags', 'status', 'created_at', 'updated_at', 'published_at']
+        fields = ['id', 'title', 'content', 'author', 'tags', 'created_at', 'updated_at']

@@ -29,11 +29,6 @@ class BlogPostListView(ListView):
     paginate_by = 10  # Number of posts per page
 
     def get_queryset(self):
-        """
-        Override this method to filter the queryset to only show published posts,
-        ordered by creation date in descending order.
-        """
-        #return BlogPost.objects.filter(status='published').order_by('-created_at')
         return BlogPost.objects.order_by('-created_at')
 
 

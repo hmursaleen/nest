@@ -24,15 +24,6 @@ class BlogPostForm(forms.ModelForm):
             }),
         }
 
-    '''
-    def clean_slug(self):
-        #Adding a clean_slug method to check for unique slugs is a good practice to avoid duplicates
-        slug = self.cleaned_data.get('slug')
-        if BlogPost.objects.filter(slug=slug).exists():
-            raise forms.ValidationError("A post with this slug already exists.")
-        return slug
-    '''
-
 
     def clean_tags(self):
         tags = self.cleaned_data.get('tags')
