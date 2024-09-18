@@ -5,13 +5,10 @@ from .forms import CommentForm
 from blogs.models import BlogPost
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 
 
-    
-    
-    
-
-    
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -55,7 +52,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 
 
-
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
@@ -71,8 +67,16 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user == comment.author
 
     def handle_no_permission(self):
-        # Customize the response if the user fails the test (e.g., redirect to the post)
-        return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.post.pk})
+        # Redirect the user to the post detail page if they are not the author
+        comment = self.get_object()  # Safely retrieve the comment object
+        '''
+        afety with get_object:
+        get_object() is used to safely retrieve the comment object before handling permissions. 
+        This ensures that the post's primary key (pk) is available for the redirection even if 
+        the permission test fails.
+        '''
+        return redirect('blogs:post_detail', pk=comment.post.pk)
+
 
         '''
         handle_no_permission Method: This method handles what happens if the user doesn't pass 
@@ -85,7 +89,9 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 
 
-from django.http import HttpResponseForbidden
+
+
+
 
 class CommentDeleteView(LoginRequiredMixin, DeleteView):
     model = Comment
@@ -95,9 +101,15 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
         """Ensure that only the author can delete the comment."""
         obj = super().get_object(queryset)
         if obj.author != self.request.user:
-            return HttpResponseForbidden("You do not have permission to delete this comment.")
+            raise PermissionDenied("You do not have permission to delete this comment.")
         return obj
-
+        '''
+        The error you're encountering is due to the get_object method returning an 
+        HttpResponseForbidden when the user is not authorized to delete the comment. 
+        In such cases, get_success_url is still called after get_object, and because 
+        HttpResponseForbidden is returned instead of a Comment object, it fails to 
+        access the post attribute, leading to the AttributeError.
+        '''
 
     def get_success_url(self):
         """Redirect to the post detail page after successful deletion."""
@@ -111,29 +123,37 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
 
 
 
-
-class ReplyCreateView(CreateView):
+class ReplyCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = 'comments/reply_form.html'
-    
 
     def form_valid(self, form):
+        # Get the parent comment using the provided 'pk' in the URL
         parent_comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
+        
+        # Set the parent, post, and author for the reply
         form.instance.parent = parent_comment
         form.instance.post = parent_comment.post
         form.instance.author = self.request.user
+        
+        # Call the parent class's form_valid method to save the reply
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        # Print form errors for debugging purposes
+        print(form.errors)
+        
+        # Render the form again with errors
+        return self.render_to_response(self.get_context_data(form=form))
+
     def get_success_url(self):
+        # Redirect to the blog post detail view after successful reply creation
         return reverse_lazy('blogs:post_detail', kwargs={'pk': self.object.post.pk})
 
-    '''
-    def get_post(self):
-        # Get the post object that this comment is associated with
-        return BlogPost.objects.get(pk=self.object.post.pk)
-    '''
     def get_context_data(self, **kwargs):
+        # Add the parent comment to the context for the template
         context = super().get_context_data(**kwargs)
         context['comment'] = get_object_or_404(Comment, pk=self.kwargs['pk'])
         return context
+

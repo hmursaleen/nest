@@ -264,7 +264,7 @@ In the example above, the directory static is assumed to be in the root of your 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = 'blogs:post_list'  # Redirect after login
 LOGOUT_REDIRECT_URL = 'authentication:login'  # Redirect after logout
 
