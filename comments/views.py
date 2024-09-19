@@ -157,3 +157,46 @@ class ReplyCreateView(LoginRequiredMixin, CreateView):
         context['comment'] = get_object_or_404(Comment, pk=self.kwargs['pk'])
         return context
 
+
+
+
+
+
+
+
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from .models import Comment
+from .serializers import CommentSerializer
+
+class IsAuthorOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission to only allow authors of a comment to edit or delete it.
+    """
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed for any request
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Write permissions are only allowed to the author of the comment
+        return obj.author == request.user
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all().order_by('-created_at')
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthorOrReadOnly]
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_update(self, serializer):
+        if self.request.user == serializer.instance.author:
+            serializer.save()
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def perform_destroy(self, instance):
+        if self.request.user == instance.author:
+            instance.delete()
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)

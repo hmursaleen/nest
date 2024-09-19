@@ -13,23 +13,20 @@ Class-based views
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path, include
 
 
-'''
 API documentation view
 
 swagger/: Provides a Swagger UI interface for your API documentation.
 redoc/: Provides a ReDoc interface for your API documentation.
-'''
+"""
 
 
+from django.contrib import admin
+from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -50,11 +47,15 @@ urlpatterns = [
     path('accounts/', include('authentication.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('buzz/', include('buzz.urls')),
-    path('post/', include('blogs.urls')),
-    path('comment/', include('comments.urls')),
-    path('search/', include('search.urls')),
+    path('post/', include('blogs.urls')),  # Regular views
+    path('comment/', include('comments.urls')),  # Regular views
+    path('search/', include('search.urls')),  # Regular views
 
+    # API Documentation
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('api/', include('blogs.urls')),  # Include the blogs app API
+
+    # API URLs
+    path('api/blogs/', include('blogs.urls')),  # API routes for blogs
+    path('api/comments/', include('comments.urls')),  # API routes for comments
 ]

@@ -23,7 +23,7 @@ router.register(r'posts', BlogPostViewSet)
 router.register(r'tags', TagViewSet)
 
 urlpatterns += [
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
 ]
 
 '''
