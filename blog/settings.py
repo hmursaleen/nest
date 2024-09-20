@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_select2',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 '''
@@ -71,17 +72,17 @@ For example, you can set the default pagination, authentication, and permissions
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT Authentication
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',  # Authenticated users can write, others can read
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 
-    #Throttling: Implement throttling to prevent abuse of your API.
-
+    # Throttling: Implement throttling to prevent abuse of your API.
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle',
         'rest_framework.throttling.AnonRateThrottle',
@@ -92,6 +93,18 @@ REST_FRAMEWORK = {
     },
 }
 
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Short-lived access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),   # Longer-lived refresh token
+    'ROTATE_REFRESH_TOKENS': True,  # Rotate refresh tokens for added security
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist the old refresh token after rotation
+    'ALGORITHM': 'HS256',  # HMAC with SHA-256 for token encoding
+    'SIGNING_KEY': SECRET_KEY,  # Ensure your SECRET_KEY is strong and secure
+    'AUTH_HEADER_TYPES': ('Bearer',),  # Accept Bearer token in Authorization header
+}
 
 
 '''

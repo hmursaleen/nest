@@ -165,9 +165,12 @@ class ReplyCreateView(LoginRequiredMixin, CreateView):
 
 
 from rest_framework import viewsets, permissions, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Comment
 from .serializers import CommentSerializer
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     """
@@ -181,11 +184,17 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         # Write permissions are only allowed to the author of the comment
         return obj.author == request.user
 
+
+
+
+
+
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-created_at')
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthorOrReadOnly]
-    
+    authentication_classes = [JWTAuthentication, SessionAuthentication]  # Use JWTAuthentication
+    permission_classes = [IsAuthorOrReadOnly, IsAuthenticated]  # Ensure permissions are set properly
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -200,3 +209,4 @@ class CommentViewSet(viewsets.ModelViewSet):
             instance.delete()
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
+

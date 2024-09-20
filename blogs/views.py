@@ -139,10 +139,12 @@ is to use viewsets, which automatically provide implementations for CRUD operati
 
 from rest_framework import viewsets
 from .serializers import BlogPostSerializer, TagSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 
 
@@ -171,11 +173,13 @@ logged-in user as the author of a blog post.
 
 
 
+
+
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all().order_by('-created_at')
     serializer_class = BlogPostSerializer
-    authentication_classes = [SessionAuthentication, TokenAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication, SessionAuthentication]  # Use JWTAuthentication
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthenticated]  # Ensure permissions are set properly
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -191,13 +195,15 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
 
 
+
 class TagViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing tag instances.
     """
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [JWTAuthentication, SessionAuthentication]  # Use JWTAuthentication
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthenticated]  # Ensure permissions are set properly
 
     def perform_create(self, serializer):
         """
@@ -210,3 +216,4 @@ class TagViewSet(viewsets.ModelViewSet):
         Override this method if you want to customize the update logic.
         """
         serializer.save()
+

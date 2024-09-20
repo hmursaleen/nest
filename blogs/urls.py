@@ -23,10 +23,11 @@ router.register(r'posts', BlogPostViewSet)
 router.register(r'tags', TagViewSet)
 
 urlpatterns += [
-    path('api/', include(router.urls)),
-]
+    path('', include(router.urls)),
+] 
 
 '''
 DefaultRouter: Automatically generates the URLs for the registered viewsets.
 router.register: Registers the viewsets with the router.
 '''
+
