@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from blogs.models import BlogPost
+from blogs.models import BlogPost, Tag
 from comments.models import Comment
 
 class CommentCreateViewTest(TestCase):
