@@ -68,8 +68,8 @@ cd blog
 
 ```bash
 
-python3 -m venv environemt_name
-source environemt_name/bin/activate  # On Windows: environemt_name\Scripts\activate
+python3 -m venv environment_name
+source environment_name/bin/activate  # On Windows: environment_name\Scripts\activate
 ```
 
 - **Install the dependencies**:
