@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'search.apps.SearchConfig',
     'buzz.apps.BuzzConfig',
     'authentication.apps.AuthenticationConfig',
+    'api.apps.ApiConfig',
     'rest_framework',
     'drf_yasg',
     'django_select2',

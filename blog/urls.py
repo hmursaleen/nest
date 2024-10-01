@@ -57,8 +57,7 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     # API URLs
-    path('api/blogs/', include('blogs.urls')),  # API routes for blogs
-    path('api/comments/', include('comments.urls')),  # API routes for comments
+    path('api/', include('api.urls')),  # API routes
 ]
 
 

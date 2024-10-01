@@ -6,7 +6,7 @@ that can then be easily rendered into JSON, XML, or other content types.
 '''
 
 from rest_framework import serializers
-from .models import BlogPost, Tag
+from blogs.models import BlogPost, Tag
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,3 +44,27 @@ class BlogPostSerializer(serializers.ModelSerializer):
         for tag in tags_data:
             instance.tags.add(tag)
         return instance
+
+
+
+
+
+
+from comments.models import Comment
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
+    parent = serializers.PrimaryKeyRelatedField(read_only=True)
+    is_reply = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'author', 'content', 'parent', 'is_reply', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'author', 'post']
+
+    def validate_content(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Comment content cannot be empty.")
+        return value

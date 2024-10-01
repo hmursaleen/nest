@@ -11,23 +11,3 @@ urlpatterns = [
     path('<int:pk>/delete/', BlogPostDeleteView.as_view(), name='post_delete'),  # Delete a post
     path('tag/<str:name>/', TagDetailView.as_view(), name='tag_detail'),
     ]
-
-
-
-
-from rest_framework.routers import DefaultRouter
-from .views import BlogPostViewSet, TagViewSet
-
-router = DefaultRouter()
-router.register(r'posts', BlogPostViewSet)
-router.register(r'tags', TagViewSet)
-
-urlpatterns += [
-    path('', include(router.urls)),
-] 
-
-'''
-DefaultRouter: Automatically generates the URLs for the registered viewsets.
-router.register: Registers the viewsets with the router.
-'''
-
