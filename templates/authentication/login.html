@@ -41,6 +41,15 @@
                 </button>
             </div>
         </form>
+
+        <!-- New signup link section -->
+        <div class="text-sm text-center mt-4">
+            <p class="text-gray-600">Don't have an account? 
+                <a href="{% url 'authentication:signup' %}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    Sign up!
+                </a>
+            </p>
+        </div>
     </div>
 </div>
 {% endblock %}
